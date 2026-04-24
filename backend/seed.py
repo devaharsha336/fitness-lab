@@ -1,12 +1,13 @@
 import asyncio
+import hashlib
 import os
 from motor.motor_asyncio import AsyncIOMotorClient
-from passlib.context import CryptContext
 from dotenv import load_dotenv
 
 load_dotenv()
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+def hash_password(password: str) -> str:
+    return hashlib.sha256(password.encode()).hexdigest()
 
 MONGO_URI = os.getenv("MONGO_URI")
 client = AsyncIOMotorClient(MONGO_URI, tlsAllowInvalidCertificates=True)
@@ -80,7 +81,7 @@ async def seed():
     if not existing:
         await db["users"].insert_one({
             "email": "admin@thefitnesslab.com",
-            "hashed_password": pwd_context.hash("FitnessLab@2024"),
+            "hashed_password": hash_password("FitnessLab@2024"),
         })
         print("✓ Admin user created")
     else:
