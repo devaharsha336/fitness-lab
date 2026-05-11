@@ -25,35 +25,146 @@ const CLASSES_FALLBACK = [
   { name: 'Personal Training', description: 'One-on-one expert coaching', schedule: 'FLEXIBLE TIMING', image_url: '/images/full_gym_overview.jpg' },
 ]
 
-function useFadeInUp() {
+const STATS = [
+  { value: 500, suffix: '+', label: 'Members' },
+  { value: 5,   suffix: '+', label: 'Years Experience' },
+  { value: 10,  suffix: '+', label: 'Expert Trainers' },
+]
+
+function useScrollObserver(threshold = 0.15) {
   const ref = useRef(null)
   useEffect(() => {
     const el = ref.current
     if (!el) return
     const obs = new IntersectionObserver(
       ([entry]) => { if (entry.isIntersecting) { el.classList.add('visible'); obs.unobserve(el) } },
-      { threshold: 0.15 }
+      { threshold }
     )
     obs.observe(el)
     return () => obs.disconnect()
-  }, [])
+  }, [threshold])
   return ref
 }
 
-function ProgramCard({ cls }) {
+function StatCounter({ value, suffix, label }) {
+  const [count, setCount] = useState(0)
+  const ref = useRef(null)
+  const animated = useRef(false)
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !animated.current) {
+          animated.current = true
+          obs.unobserve(el)
+          const duration = 2000
+          const start = performance.now()
+          const tick = (now) => {
+            const progress = Math.min((now - start) / duration, 1)
+            setCount(Math.floor(progress * value))
+            if (progress < 1) requestAnimationFrame(tick)
+          }
+          requestAnimationFrame(tick)
+        }
+      },
+      { threshold: 0.5 }
+    )
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [value])
+
   return (
     <div
-      className="relative overflow-hidden min-h-64 flex flex-col justify-end p-6 group cursor-pointer"
-      style={{ backgroundImage: `url(${cls.image_url})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+      ref={ref}
+      className="glass p-8 text-center animate-on-scroll"
+      style={{ transitionDelay: '0.1s' }}
     >
-      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
-      <div className="relative z-10">
+      <p className="section-heading" style={{ fontSize: 'clamp(48px, 6vw, 72px)', color: '#E6FF00' }}>
+        {count}{suffix}
+      </p>
+      <p className="text-muted text-sm uppercase tracking-widest mt-3">{label}</p>
+    </div>
+  )
+}
+
+function ProgramCard({ cls, index }) {
+  const ref = useScrollObserver(0.1)
+
+  return (
+    <div
+      ref={ref}
+      className="relative overflow-hidden min-h-64 flex flex-col justify-end group cursor-pointer animate-on-scroll"
+      style={{
+        border: '1px solid rgba(255,255,255,0.1)',
+        transitionDelay: `${index * 0.15}s`,
+        transition: 'opacity 0.7s ease, transform 0.7s ease, border-color 0.3s ease',
+      }}
+      onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'rgba(230,255,0,0.4)' }}
+      onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)' }}
+    >
+      {/* Background with zoom on hover */}
+      <div
+        className="absolute inset-0 transition-transform duration-500 group-hover:scale-105"
+        style={{ backgroundImage: `url(${cls.image_url})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+      />
+      {/* Glass dark overlay */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background: 'rgba(0,0,0,0.4)',
+          backdropFilter: 'blur(2px)',
+          WebkitBackdropFilter: 'blur(2px)',
+        }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+      <div className="relative z-10 p-6">
         <Dumbbell size={20} style={{ color: '#E6FF00' }} className="mb-2" />
         <h3 className="section-heading text-2xl mb-1">{cls.name.toUpperCase()}</h3>
         <p className="text-muted text-sm mb-2">{cls.description}</p>
         <p className="text-xs font-medium tracking-widest uppercase" style={{ color: '#E6FF00' }}>{cls.schedule}</p>
       </div>
     </div>
+  )
+}
+
+function FacilityImage({ src, index }) {
+  const ref = useScrollObserver(0.1)
+  return (
+    <div
+      ref={ref}
+      className="overflow-hidden aspect-video animate-on-scroll"
+      style={{ transitionDelay: `${index * 0.1}s` }}
+    >
+      <img
+        src={src}
+        alt="Fitness Lab facility"
+        className="w-full h-full object-cover transition-all duration-500 hover:scale-[1.03] hover:brightness-110"
+      />
+    </div>
+  )
+}
+
+function PricingRow({ row, index }) {
+  const ref = useScrollObserver(0.1)
+  return (
+    <tr
+      ref={ref}
+      className="animate-from-left pricing-row"
+      style={{ transitionDelay: `${index * 0.1}s` }}
+    >
+      <td className="py-4 pr-6">
+        <span className="text-white font-medium">{row.name}</span>
+        {(row.best_price || row.bestPrice) && (
+          <span className="block text-xs font-bold uppercase tracking-wider" style={{ color: '#E6FF00' }}>Best Price</span>
+        )}
+      </td>
+      <td className="py-4 pr-6 text-muted">{row.monthly}</td>
+      <td className="py-4 pr-6 text-muted">{row.quarterly}</td>
+      <td className="py-4 pr-6 text-muted">{row.half_yearly || row.halfYearly}</td>
+      <td className="py-4 text-muted">{row.yearly}</td>
+    </tr>
   )
 }
 
@@ -66,35 +177,81 @@ export default function Home() {
     fetch(`${API}/api/pricing`).then(r => r.json()).then(data => { if (data.length) setPricing(data) }).catch(() => {})
   }, [])
 
-  const programsRef = useFadeInUp()
-  const facilityRef = useFadeInUp()
-  const pricingRef = useFadeInUp()
-  const ctaRef = useFadeInUp()
+  const labelProgramsRef = useRef(null)
+  const headingProgramsRef = useRef(null)
+  const labelFacilityRef = useRef(null)
+  const headingFacilityRef = useRef(null)
+  const labelPricingRef = useRef(null)
+  const headingPricingRef = useRef(null)
+  const ctaRef = useRef(null)
+
+  useEffect(() => {
+    const els = [
+      { el: labelProgramsRef.current, cls: 'animate-from-left' },
+      { el: headingProgramsRef.current, cls: 'animate-on-scroll' },
+      { el: labelFacilityRef.current, cls: 'animate-from-left' },
+      { el: headingFacilityRef.current, cls: 'animate-on-scroll' },
+      { el: labelPricingRef.current, cls: 'animate-from-left' },
+      { el: headingPricingRef.current, cls: 'animate-on-scroll' },
+      { el: ctaRef.current, cls: 'animate-on-scroll' },
+    ]
+    const observers = els.map(({ el, cls }) => {
+      if (!el) return null
+      el.classList.add(cls)
+      const obs = new IntersectionObserver(
+        ([entry]) => { if (entry.isIntersecting) { el.classList.add('visible'); obs.unobserve(el) } },
+        { threshold: 0.15 }
+      )
+      obs.observe(el)
+      return obs
+    })
+    return () => observers.forEach((obs) => obs?.disconnect())
+  }, [])
 
   const displayClasses = classes.length ? classes : CLASSES_FALLBACK
 
   return (
     <>
       {/* HERO */}
-      <section
-        className="relative min-h-screen flex flex-col justify-center px-8 md:px-16"
-        style={{ backgroundImage: 'url(/images/hero_banner.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }}
-      >
+      <section className="relative min-h-screen flex flex-col justify-center px-8 md:px-16 overflow-hidden">
+        {/* Background with zoom animation */}
+        <div
+          className="absolute inset-0 hero-bg"
+          style={{ backgroundImage: 'url(/images/hero_banner.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }}
+        />
+        {/* Dark overlay */}
         <div className="absolute inset-0" style={{ background: 'linear-gradient(to right, rgba(0,0,0,0.92) 40%, rgba(0,0,0,0.3))' }} />
+
+        {/* Floating orbs */}
+        <div className="absolute pointer-events-none" style={{ top: '25%', right: '25%', width: 128, height: 128, borderRadius: '50%', background: 'rgba(230,255,0,0.06)', filter: 'blur(20px)', animation: 'float 5s ease-in-out infinite' }} />
+        <div className="absolute pointer-events-none" style={{ top: '50%', right: '35%', width: 80, height: 80, borderRadius: '50%', background: 'rgba(230,255,0,0.08)', filter: 'blur(15px)', animation: 'float 4s ease-in-out infinite 1s' }} />
+        <div className="absolute pointer-events-none" style={{ bottom: '30%', right: '15%', width: 160, height: 160, borderRadius: '50%', background: 'rgba(230,255,0,0.04)', filter: 'blur(25px)', animation: 'float 6s ease-in-out infinite 0.5s' }} />
+
         <div className="relative z-10 max-w-3xl pt-24">
-          <p className="section-label mb-6">Premium Fitness Experience</p>
+          <p className="section-label mb-6 hero-label">Premium Fitness Experience</p>
           <h1 className="section-heading" style={{ fontSize: 'clamp(64px, 10vw, 96px)', lineHeight: 1 }}>
-            THE<br />FITNESS<br /><span style={{ color: '#E6FF00' }}>LAB</span>
+            <span className="block hero-the">THE</span>
+            <span className="block hero-fit">FITNESS</span>
+            <span className="block hero-lab" style={{ color: '#E6FF00' }}>LAB</span>
           </h1>
-          <p className="text-muted mt-6 mb-8 max-w-lg leading-relaxed">
+          <p className="text-muted mt-6 mb-8 max-w-lg leading-relaxed hero-sub">
             Where science meets sweat. Transform your body with world-class training, cutting-edge equipment, and relentless discipline.
           </p>
-          <div className="flex flex-wrap gap-4">
+          <div className="flex flex-wrap gap-4 hero-btns">
             <a
               href="https://api.whatsapp.com/send/?phone=919912223125&text&type=phone_number&app_absent=0"
               target="_blank"
               rel="noreferrer"
-              className="bg-accent text-black font-body font-bold text-sm uppercase tracking-widest px-7 py-3 hover:opacity-90 transition-opacity"
+              className="bg-accent text-black font-body font-bold text-sm uppercase tracking-widest px-7 py-3"
+              style={{ transition: 'transform 0.2s ease, box-shadow 0.2s ease' }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.boxShadow = '0 0 20px rgba(230,255,0,0.4)'
+                e.currentTarget.style.transform = 'scale(1.02)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.boxShadow = 'none'
+                e.currentTarget.style.transform = 'scale(1)'
+              }}
             >
               JOIN NOW →
             </a>
@@ -107,8 +264,8 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Social icons row at bottom */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-3 z-10">
+        {/* Social icons */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-3 z-10 hero-social">
           {SOCIAL.map(({ icon: Icon, href, label }) => (
             <a
               key={label}
@@ -116,7 +273,16 @@ export default function Home() {
               target="_blank"
               rel="noreferrer"
               aria-label={label}
-              className="w-10 h-10 border border-white/30 flex items-center justify-center text-white/60 hover:border-accent hover:text-accent transition-colors"
+              className="w-10 h-10 flex items-center justify-center transition-all duration-200 hover:scale-110"
+              style={{ border: '1px solid rgba(255,255,255,0.3)', color: 'rgba(255,255,255,0.6)' }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = '#E6FF00'
+                e.currentTarget.style.color = '#E6FF00'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)'
+                e.currentTarget.style.color = 'rgba(255,255,255,0.6)'
+              }}
             >
               <Icon size={16} />
             </a>
@@ -125,35 +291,41 @@ export default function Home() {
       </section>
 
       {/* OUR PROGRAMS */}
-      <section className="py-20 px-6 md:px-16 max-w-7xl mx-auto fade-in-up" ref={programsRef}>
-        <p className="section-label mb-3">What We Offer</p>
-        <h2 className="section-heading text-5xl md:text-6xl mb-10">Our Programs</h2>
+      <section className="py-20 px-6 md:px-16 max-w-7xl mx-auto">
+        <p ref={labelProgramsRef} className="section-label mb-3">What We Offer</p>
+        <h2 ref={headingProgramsRef} className="section-heading text-5xl md:text-6xl mb-10">Our Programs</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {displayClasses.map((cls) => <ProgramCard key={cls.name} cls={cls} />)}
+          {displayClasses.map((cls, i) => <ProgramCard key={cls.name} cls={cls} index={i} />)}
+        </div>
+      </section>
+
+      {/* STATS */}
+      <section className="py-16 px-6 md:px-16 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {STATS.map((s) => <StatCounter key={s.label} {...s} />)}
         </div>
       </section>
 
       {/* OUR FACILITY */}
-      <section className="py-20 px-6 md:px-16 max-w-7xl mx-auto fade-in-up" ref={facilityRef}>
-        <p className="section-label mb-3">Take A Look</p>
-        <h2 className="section-heading text-5xl md:text-6xl mb-10">Our Facility</h2>
+      <section className="py-20 px-6 md:px-16 max-w-7xl mx-auto">
+        <p ref={labelFacilityRef} className="section-label mb-3">Take A Look</p>
+        <h2 ref={headingFacilityRef} className="section-heading text-5xl md:text-6xl mb-10">Our Facility</h2>
         <div className="grid grid-cols-2 gap-2">
-          {['/images/full_gym_overview.jpg', '/images/cardio_zone.jpg', '/images/strength_weights.jpg', '/images/hero_banner.jpg'].map((src) => (
-            <div key={src} className="overflow-hidden aspect-video">
-              <img
-                src={src}
-                alt="Fitness Lab facility"
-                className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-              />
-            </div>
+          {[
+            '/images/full_gym_overview.jpg',
+            '/images/cardio_zone.jpg',
+            '/images/strength_weights.jpg',
+            '/images/hero_banner.jpg',
+          ].map((src, i) => (
+            <FacilityImage key={src} src={src} index={i} />
           ))}
         </div>
       </section>
 
       {/* OUR PACKAGES */}
-      <section className="py-20 px-6 md:px-16 max-w-7xl mx-auto fade-in-up" ref={pricingRef}>
-        <p className="section-label mb-3">Membership Plans</p>
-        <h2 className="section-heading text-5xl md:text-6xl mb-10">Our Packages</h2>
+      <section className="py-20 px-6 md:px-16 max-w-7xl mx-auto">
+        <p ref={labelPricingRef} className="section-label mb-3">Membership Plans</p>
+        <h2 ref={headingPricingRef} className="section-heading text-5xl md:text-6xl mb-10">Our Packages</h2>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
@@ -164,19 +336,8 @@ export default function Home() {
               </tr>
             </thead>
             <tbody>
-              {pricing.map((row) => (
-                <tr key={row.name} className="border-b border-border hover:bg-[#1a1a1a] transition-colors">
-                  <td className="py-4 pr-6">
-                    <span className="text-white font-medium">{row.name}</span>
-                    {(row.best_price || row.bestPrice) && (
-                      <span className="block text-xs font-bold uppercase tracking-wider" style={{ color: '#E6FF00' }}>Best Price</span>
-                    )}
-                  </td>
-                  <td className="py-4 pr-6 text-muted">{row.monthly}</td>
-                  <td className="py-4 pr-6 text-muted">{row.quarterly}</td>
-                  <td className="py-4 pr-6 text-muted">{row.half_yearly || row.halfYearly}</td>
-                  <td className="py-4 text-muted">{row.yearly}</td>
-                </tr>
+              {pricing.map((row, i) => (
+                <PricingRow key={row.name} row={row} index={i} />
               ))}
             </tbody>
           </table>
@@ -186,7 +347,16 @@ export default function Home() {
             href="https://api.whatsapp.com/send/?phone=919912223125&text&type=phone_number&app_absent=0"
             target="_blank"
             rel="noreferrer"
-            className="inline-block bg-accent text-black font-bold text-sm uppercase tracking-widest px-10 py-3 hover:opacity-90 transition-opacity"
+            className="inline-block bg-accent text-black font-bold text-sm uppercase tracking-widest px-10 py-3"
+            style={{ transition: 'transform 0.2s ease, box-shadow 0.2s ease' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.boxShadow = '0 0 20px rgba(230,255,0,0.4)'
+              e.currentTarget.style.transform = 'scale(1.02)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.boxShadow = 'none'
+              e.currentTarget.style.transform = 'scale(1)'
+            }}
           >
             BOOK NOW →
           </a>
@@ -194,7 +364,7 @@ export default function Home() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 px-6 md:px-16 border-t border-border fade-in-up" ref={ctaRef}>
+      <section ref={ctaRef} className="py-20 px-6 md:px-16 border-t border-border">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
           <div>
             <p className="section-label mb-3">Get In Touch</p>
@@ -209,7 +379,16 @@ export default function Home() {
             href="https://api.whatsapp.com/send/?phone=919912223125&text&type=phone_number&app_absent=0"
             target="_blank"
             rel="noreferrer"
-            className="flex-shrink-0 bg-accent text-black font-bold text-sm uppercase tracking-widest px-10 py-4 hover:opacity-90 transition-opacity"
+            className="flex-shrink-0 bg-accent text-black font-bold text-sm uppercase tracking-widest px-10 py-4"
+            style={{ transition: 'transform 0.2s ease, box-shadow 0.2s ease' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.boxShadow = '0 0 20px rgba(230,255,0,0.4)'
+              e.currentTarget.style.transform = 'scale(1.02)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.boxShadow = 'none'
+              e.currentTarget.style.transform = 'scale(1)'
+            }}
           >
             CHAT ON WHATSAPP →
           </a>
