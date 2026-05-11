@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { X, ChevronLeft, ChevronRight } from 'lucide-react'
 
 const IMAGES = [
@@ -10,8 +10,57 @@ const IMAGES = [
   { src: '/images/reception_about.jpg', alt: 'Reception area' },
 ]
 
+function GalleryImage({ img, index, onClick }) {
+  const ref = useRef(null)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { el.classList.add('visible'); obs.unobserve(el) } },
+      { threshold: 0.1 }
+    )
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [])
+
+  return (
+    <div
+      ref={ref}
+      className="overflow-hidden cursor-pointer aspect-video animate-on-scroll"
+      style={{ transitionDelay: `${index * 0.08}s` }}
+      onClick={onClick}
+    >
+      <img
+        src={img.src}
+        alt={img.alt}
+        className="w-full h-full object-cover transition-all duration-500 hover:scale-[1.05] hover:brightness-110"
+      />
+    </div>
+  )
+}
+
 export default function Gallery() {
   const [lightbox, setLightbox] = useState(null)
+  const labelRef = useRef(null)
+  const headingRef = useRef(null)
+
+  useEffect(() => {
+    const els = [
+      { el: labelRef.current, cls: 'animate-from-left' },
+      { el: headingRef.current, cls: 'animate-on-scroll' },
+    ]
+    const observers = els.map(({ el, cls }) => {
+      if (!el) return null
+      el.classList.add(cls)
+      const obs = new IntersectionObserver(
+        ([entry]) => { if (entry.isIntersecting) { el.classList.add('visible'); obs.unobserve(el) } },
+        { threshold: 0.15 }
+      )
+      obs.observe(el)
+      return obs
+    })
+    return () => observers.forEach((obs) => obs?.disconnect())
+  }, [])
 
   const prev = () => setLightbox((i) => (i - 1 + IMAGES.length) % IMAGES.length)
   const next = () => setLightbox((i) => (i + 1) % IMAGES.length)
@@ -24,22 +73,12 @@ export default function Gallery() {
 
   return (
     <div className="min-h-screen pt-24 pb-20 px-6 md:px-16 max-w-7xl mx-auto">
-      <p className="section-label mb-3">Take A Look</p>
-      <h1 className="section-heading text-5xl md:text-7xl mb-12">Our Gallery</h1>
+      <p ref={labelRef} className="section-label mb-3">Take A Look</p>
+      <h1 ref={headingRef} className="section-heading text-5xl md:text-7xl mb-12">Our Gallery</h1>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {IMAGES.map((img, i) => (
-          <div
-            key={img.src}
-            className="overflow-hidden cursor-pointer aspect-video"
-            onClick={() => setLightbox(i)}
-          >
-            <img
-              src={img.src}
-              alt={img.alt}
-              className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-            />
-          </div>
+          <GalleryImage key={img.src} img={img} index={i} onClick={() => setLightbox(i)} />
         ))}
       </div>
 
@@ -51,16 +90,10 @@ export default function Gallery() {
           onKeyDown={handleKey}
           tabIndex={0}
         >
-          <button
-            className="absolute top-4 right-4 text-white hover:text-accent transition-colors"
-            onClick={() => setLightbox(null)}
-          >
+          <button className="absolute top-4 right-4 text-white hover:text-accent transition-colors" onClick={() => setLightbox(null)}>
             <X size={28} />
           </button>
-          <button
-            className="absolute left-4 text-white hover:text-accent transition-colors p-2"
-            onClick={(e) => { e.stopPropagation(); prev() }}
-          >
+          <button className="absolute left-4 text-white hover:text-accent transition-colors p-2" onClick={(e) => { e.stopPropagation(); prev() }}>
             <ChevronLeft size={36} />
           </button>
           <img
@@ -69,15 +102,10 @@ export default function Gallery() {
             className="max-h-[85vh] max-w-[85vw] object-contain"
             onClick={(e) => e.stopPropagation()}
           />
-          <button
-            className="absolute right-4 text-white hover:text-accent transition-colors p-2"
-            onClick={(e) => { e.stopPropagation(); next() }}
-          >
+          <button className="absolute right-4 text-white hover:text-accent transition-colors p-2" onClick={(e) => { e.stopPropagation(); next() }}>
             <ChevronRight size={36} />
           </button>
-          <div className="absolute bottom-4 text-muted text-sm">
-            {lightbox + 1} / {IMAGES.length}
-          </div>
+          <div className="absolute bottom-4 text-muted text-sm">{lightbox + 1} / {IMAGES.length}</div>
         </div>
       )}
     </div>
