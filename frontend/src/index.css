@@ -45,6 +45,54 @@ body {
   line-height: 1;
 }
 
+/* ── Glassmorphism utilities ─────────────────────────────── */
+
+.glass {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-dark {
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-yellow {
+  background: rgba(230, 255, 0, 0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(230, 255, 0, 0.2);
+}
+
+/* ── Scroll animation classes ────────────────────────────── */
+
+.animate-on-scroll {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.animate-on-scroll.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.animate-from-left {
+  opacity: 0;
+  transform: translateX(-30px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.animate-from-left.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Legacy alias — keep for any existing .fade-in-up usages */
 .fade-in-up {
   opacity: 0;
   transform: translateY(30px);
@@ -54,4 +102,99 @@ body {
 .fade-in-up.visible {
   opacity: 1;
   transform: translateY(0);
+}
+
+/* ── Keyframes ───────────────────────────────────────────── */
+
+@keyframes heroZoom {
+  from { transform: scale(1.05); }
+  to   { transform: scale(1.0); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-20px); }
+}
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeSlideLeft {
+  from { opacity: 0; transform: translateX(-40px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Hero animation classes ──────────────────────────────── */
+
+.hero-label  { opacity: 0; animation: fadeSlideLeft 0.6s ease forwards 0.2s; }
+.hero-the    { opacity: 0; animation: fadeSlideUp   0.6s ease forwards 0.3s; }
+.hero-fit    { opacity: 0; animation: fadeSlideUp   0.6s ease forwards 0.5s; }
+.hero-lab    { opacity: 0; animation: fadeSlideUp   0.6s ease forwards 0.7s; }
+.hero-sub    { opacity: 0; animation: fadeSlideUp   0.6s ease forwards 0.9s; }
+.hero-btns   { opacity: 0; animation: fadeSlideUp   0.6s ease forwards 1.1s; }
+.hero-social { opacity: 0; animation: fadeSlideUp   0.6s ease forwards 1.3s; }
+.hero-bg     { animation: heroZoom 8s ease forwards; transform-origin: center; }
+
+/* ── Page transition ─────────────────────────────────────── */
+
+.page-enter { animation: fadeSlideUp 0.4s ease forwards; }
+
+/* ── Navbar link underline slide ─────────────────────────── */
+
+.nav-link {
+  position: relative;
+}
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: #E6FF00;
+  transition: width 0.25s ease;
+}
+.nav-link:hover::after {
+  width: 100%;
+}
+
+/* ── Pricing row glass ───────────────────────────────────── */
+
+.pricing-row {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: background 0.3s ease, border-color 0.3s ease, transform 0.3s ease, opacity 0.7s ease;
+}
+
+.pricing-row:hover {
+  background: rgba(230, 255, 0, 0.05);
+  border-color: rgba(230, 255, 0, 0.2);
+  transform: translateX(4px);
+}
+
+/* ── Reduced motion ──────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  .animate-on-scroll,
+  .animate-from-left,
+  .fade-in-up,
+  .hero-label, .hero-the, .hero-fit, .hero-lab,
+  .hero-sub, .hero-btns, .hero-social,
+  .page-enter,
+  .pricing-row {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
 }
