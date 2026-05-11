@@ -41,8 +41,14 @@ export default function OwnerLogin() {
       </Link>
 
       <div
-        className="w-full max-w-md bg-card border border-border p-10"
-        style={{ boxShadow: '0 0 40px rgba(230,255,0,0.08)' }}
+        className="w-full max-w-md p-10"
+        style={{
+          background: 'rgba(255, 255, 255, 0.05)',
+          backdropFilter: 'blur(30px)',
+          WebkitBackdropFilter: 'blur(30px)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          boxShadow: '0 0 40px rgba(230, 255, 0, 0.15)',
+        }}
       >
         <h1 className="section-heading text-4xl mb-2">
           OWNER <span style={{ color: '#E6FF00' }}>LOGIN</span>
