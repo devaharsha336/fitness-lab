@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Check } from 'lucide-react'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8000'
@@ -18,17 +18,76 @@ const PERKS = [
   'Nutrition guidance',
 ]
 
+const COLS = ['Package', 'Monthly', 'Quarterly', 'Half-Yearly', 'Yearly']
+
+function PricingRow({ row, index }) {
+  const ref = useRef(null)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { el.classList.add('visible'); obs.unobserve(el) } },
+      { threshold: 0.1 }
+    )
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [])
+
+  return (
+    <div
+      ref={ref}
+      className="grid animate-from-left pricing-row"
+      style={{
+        gridTemplateColumns: 'repeat(5, 1fr)',
+        transitionDelay: `${index * 0.1}s`,
+        padding: '20px 24px',
+      }}
+    >
+      <div>
+        <span className="text-white font-medium">{row.name}</span>
+        {row.best_price && (
+          <span className="block text-xs font-bold uppercase tracking-wider mt-0.5" style={{ color: '#E6FF00' }}>Best Price</span>
+        )}
+      </div>
+      <div className="text-muted font-medium self-center">{row.monthly}</div>
+      <div className="text-muted font-medium self-center">{row.quarterly}</div>
+      <div className="text-muted font-medium self-center">{row.half_yearly}</div>
+      <div className="text-muted font-medium self-center">{row.yearly}</div>
+    </div>
+  )
+}
+
 export default function Pricing() {
   const [pricing, setPricing] = useState(FALLBACK)
+  const labelRef = useRef(null)
+  const headingRef = useRef(null)
 
   useEffect(() => {
     fetch(`${API}/api/pricing`).then(r => r.json()).then(data => { if (data.length) setPricing(data) }).catch(() => {})
   }, [])
 
+  useEffect(() => {
+    const els = [
+      { el: labelRef.current, cls: 'animate-from-left' },
+      { el: headingRef.current, cls: 'animate-on-scroll' },
+    ]
+    const observers = els.map(({ el, cls }) => {
+      if (!el) return null
+      el.classList.add(cls)
+      const obs = new IntersectionObserver(
+        ([entry]) => { if (entry.isIntersecting) { el.classList.add('visible'); obs.unobserve(el) } },
+        { threshold: 0.15 }
+      )
+      obs.observe(el)
+      return obs
+    })
+    return () => observers.forEach((obs) => obs?.disconnect())
+  }, [])
+
   return (
     <div className="min-h-screen pt-24 pb-20 px-6 md:px-16 max-w-7xl mx-auto">
-      <p className="section-label mb-3">Membership Plans</p>
-      <h1 className="section-heading text-5xl md:text-7xl mb-4">Our Packages</h1>
+      <p ref={labelRef} className="section-label mb-3">Membership Plans</p>
+      <h1 ref={headingRef} className="section-heading text-5xl md:text-7xl mb-4">Our Packages</h1>
       <p className="text-muted mb-12 max-w-xl">All memberships include full access to our facility. Choose the plan that works for you.</p>
 
       {/* Perks */}
@@ -41,33 +100,26 @@ export default function Pricing() {
         ))}
       </div>
 
-      {/* Table */}
-      <div className="overflow-x-auto border border-border">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-border bg-card">
-              {['Package', 'Monthly', 'Quarterly', 'Half-Yearly', 'Yearly'].map((h) => (
-                <th key={h} className="font-heading font-bold uppercase text-left px-6 py-4" style={{ color: '#E6FF00', fontSize: '0.85rem', letterSpacing: '0.1em' }}>{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {pricing.map((row) => (
-              <tr key={row.name} className="border-b border-border hover:bg-[#1a1a1a] transition-colors">
-                <td className="px-6 py-5">
-                  <span className="text-white font-medium">{row.name}</span>
-                  {row.best_price && (
-                    <span className="block text-xs font-bold uppercase tracking-wider mt-0.5" style={{ color: '#E6FF00' }}>Best Price</span>
-                  )}
-                </td>
-                <td className="px-6 py-5 text-muted font-medium">{row.monthly}</td>
-                <td className="px-6 py-5 text-muted font-medium">{row.quarterly}</td>
-                <td className="px-6 py-5 text-muted font-medium">{row.half_yearly}</td>
-                <td className="px-6 py-5 text-muted font-medium">{row.yearly}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      {/* Table header */}
+      <div
+        className="grid mb-px"
+        style={{
+          gridTemplateColumns: 'repeat(5, 1fr)',
+          background: 'rgba(17,17,17,0.9)',
+          backdropFilter: 'blur(10px)',
+          WebkitBackdropFilter: 'blur(10px)',
+          borderBottom: '1px solid rgba(255,255,255,0.1)',
+          padding: '16px 24px',
+        }}
+      >
+        {COLS.map((h) => (
+          <div key={h} className="font-heading font-bold uppercase" style={{ color: '#E6FF00', fontSize: '0.85rem', letterSpacing: '0.1em' }}>{h}</div>
+        ))}
+      </div>
+
+      {/* Rows */}
+      <div className="flex flex-col gap-px">
+        {pricing.map((row, i) => <PricingRow key={row.name} row={row} index={i} />)}
       </div>
 
       <div className="text-center mt-12">
@@ -76,7 +128,16 @@ export default function Pricing() {
           href="https://api.whatsapp.com/send/?phone=919912223125&text&type=phone_number&app_absent=0"
           target="_blank"
           rel="noreferrer"
-          className="inline-block bg-accent text-black font-bold text-sm uppercase tracking-widest px-12 py-4 hover:opacity-90 transition-opacity"
+          className="inline-block bg-accent text-black font-bold text-sm uppercase tracking-widest px-12 py-4"
+          style={{ transition: 'transform 0.2s ease, box-shadow 0.2s ease' }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.boxShadow = '0 0 20px rgba(230,255,0,0.4)'
+            e.currentTarget.style.transform = 'scale(1.02)'
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.boxShadow = 'none'
+            e.currentTarget.style.transform = 'scale(1)'
+          }}
         >
           BOOK NOW →
         </a>
