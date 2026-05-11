@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
+import { useEffect, useRef } from 'react'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import Home from './pages/Home'
@@ -14,6 +15,19 @@ function ProtectedRoute({ children }) {
   return token ? children : <Navigate to="/owner-login" replace />
 }
 
+function PageWrapper({ children }) {
+  const ref = useRef(null)
+  const { pathname } = useLocation()
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    el.classList.remove('page-enter')
+    void el.offsetWidth // force reflow to restart animation
+    el.classList.add('page-enter')
+  }, [pathname])
+  return <div ref={ref}>{children}</div>
+}
+
 function Layout({ children }) {
   return (
     <>
@@ -27,15 +41,17 @@ function Layout({ children }) {
 export default function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Layout><Home /></Layout>} />
-        <Route path="/classes" element={<Layout><Classes /></Layout>} />
-        <Route path="/gallery" element={<Layout><Gallery /></Layout>} />
-        <Route path="/pricing" element={<Layout><Pricing /></Layout>} />
-        <Route path="/contact" element={<Layout><Contact /></Layout>} />
-        <Route path="/owner-login" element={<OwnerLogin />} />
-        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-      </Routes>
+      <PageWrapper>
+        <Routes>
+          <Route path="/" element={<Layout><Home /></Layout>} />
+          <Route path="/classes" element={<Layout><Classes /></Layout>} />
+          <Route path="/gallery" element={<Layout><Gallery /></Layout>} />
+          <Route path="/pricing" element={<Layout><Pricing /></Layout>} />
+          <Route path="/contact" element={<Layout><Contact /></Layout>} />
+          <Route path="/owner-login" element={<OwnerLogin />} />
+          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+        </Routes>
+      </PageWrapper>
     </BrowserRouter>
   )
 }
