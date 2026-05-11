@@ -13,37 +13,63 @@ export default function Navbar() {
   }, [])
 
   const navLinkClass = ({ isActive }) =>
-    `text-xs font-body font-medium uppercase tracking-widest transition-colors duration-200 ${
+    `nav-link text-xs font-body font-medium uppercase tracking-widest transition-colors duration-200 ${
       isActive ? 'text-accent' : 'text-white hover:text-accent'
     }`
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled ? 'bg-black border-b border-border' : 'bg-transparent'
-      }`}
+      className="fixed top-0 left-0 right-0 z-50 transition-all duration-500"
+      style={scrolled ? {
+        background: 'rgba(0, 0, 0, 0.6)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+      } : {}}
     >
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between h-16">
         {/* Logo */}
-        <Link to="/" className="font-heading font-extrabold text-xl uppercase text-white tracking-tight">
+        <Link
+          to="/"
+          className="font-heading font-extrabold text-xl uppercase text-white tracking-tight hero-label"
+          style={{ animationDelay: '0s' }}
+        >
           THE FITNESS <span style={{ color: '#E6FF00' }}>LAB</span>
         </Link>
 
         {/* Desktop Links */}
         <div className="hidden md:flex items-center gap-8">
-          <NavLink to="/classes" className={navLinkClass}>Classes</NavLink>
-          <NavLink to="/gallery" className={navLinkClass}>Gallery</NavLink>
-          <NavLink to="/pricing" className={navLinkClass}>Pricing</NavLink>
-          <NavLink to="/contact" className={navLinkClass}>Contact</NavLink>
+          {['classes', 'gallery', 'pricing', 'contact'].map((page, i) => (
+            <NavLink
+              key={page}
+              to={`/${page}`}
+              className={navLinkClass}
+              style={{ opacity: 0, animation: `fadeSlideUp 0.5s ease forwards ${0.1 + i * 0.08}s` }}
+            >
+              {page}
+            </NavLink>
+          ))}
         </div>
 
         {/* Desktop Right */}
-        <div className="hidden md:flex items-center gap-4">
+        <div
+          className="hidden md:flex items-center gap-4"
+          style={{ opacity: 0, animation: 'fadeSlideUp 0.5s ease forwards 0.45s' }}
+        >
           <a
             href="https://api.whatsapp.com/send/?phone=919912223125&text&type=phone_number&app_absent=0"
             target="_blank"
             rel="noreferrer"
-            className="bg-accent text-black font-body font-bold text-xs uppercase tracking-widest px-5 py-2 transition-opacity hover:opacity-90"
+            className="bg-accent text-black font-body font-bold text-xs uppercase tracking-widest px-5 py-2"
+            style={{ transition: 'transform 0.2s ease, box-shadow 0.2s ease' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.boxShadow = '0 0 20px rgba(230,255,0,0.4)'
+              e.currentTarget.style.transform = 'scale(1.02)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.boxShadow = 'none'
+              e.currentTarget.style.transform = 'scale(1)'
+            }}
           >
             JOIN NOW
           </a>
@@ -66,9 +92,19 @@ export default function Navbar() {
         </button>
       </div>
 
-      {/* Mobile Menu */}
-      {menuOpen && (
-        <div className="md:hidden bg-black border-t border-border px-6 py-4 flex flex-col gap-4">
+      {/* Mobile Menu — smooth slide */}
+      <div
+        className="md:hidden overflow-hidden transition-all duration-300"
+        style={{
+          maxHeight: menuOpen ? '400px' : '0',
+          opacity: menuOpen ? 1 : 0,
+          background: 'rgba(0, 0, 0, 0.85)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          borderTop: menuOpen ? '1px solid rgba(255,255,255,0.1)' : 'none',
+        }}
+      >
+        <div className="px-6 py-4 flex flex-col gap-4">
           {['classes', 'gallery', 'pricing', 'contact'].map((page) => (
             <NavLink
               key={page}
@@ -96,7 +132,7 @@ export default function Navbar() {
             Owner Login
           </Link>
         </div>
-      )}
+      </div>
     </nav>
   )
 }
