@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import { MapPin, Phone, Clock, Instagram, Facebook, MessageCircle } from 'lucide-react'
 
 const SOCIAL = [
@@ -8,11 +9,32 @@ const SOCIAL = [
 ]
 
 export default function Contact() {
+  const leftRef = useRef(null)
+  const rightRef = useRef(null)
+
+  useEffect(() => {
+    const els = [
+      { el: leftRef.current, cls: 'animate-from-left' },
+      { el: rightRef.current, cls: 'animate-on-scroll' },
+    ]
+    const observers = els.map(({ el, cls }) => {
+      if (!el) return null
+      el.classList.add(cls)
+      const obs = new IntersectionObserver(
+        ([entry]) => { if (entry.isIntersecting) { el.classList.add('visible'); obs.unobserve(el) } },
+        { threshold: 0.15 }
+      )
+      obs.observe(el)
+      return obs
+    })
+    return () => observers.forEach((obs) => obs?.disconnect())
+  }, [])
+
   return (
     <div className="min-h-screen pt-24 pb-20 px-6 md:px-16 max-w-7xl mx-auto">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
         {/* LEFT */}
-        <div>
+        <div ref={leftRef}>
           <p className="section-label mb-3">Get In Touch</p>
           <h1 className="section-heading text-5xl md:text-6xl mb-10">Contact Us</h1>
 
@@ -51,7 +73,16 @@ export default function Contact() {
                 target="_blank"
                 rel="noreferrer"
                 aria-label={label}
-                className="w-10 h-10 border border-border flex items-center justify-center text-muted hover:text-accent hover:border-accent transition-colors"
+                className="w-10 h-10 flex items-center justify-center transition-all duration-200 hover:scale-110"
+                style={{ border: '1px solid rgba(255,255,255,0.15)', color: '#888888' }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = '#E6FF00'
+                  e.currentTarget.style.color = '#E6FF00'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'
+                  e.currentTarget.style.color = '#888888'
+                }}
               >
                 <Icon size={16} />
               </a>
@@ -59,8 +90,18 @@ export default function Contact() {
           </div>
         </div>
 
-        {/* RIGHT */}
-        <div className="bg-card border border-border p-10 flex flex-col items-center text-center">
+        {/* RIGHT — glass card */}
+        <div
+          ref={rightRef}
+          className="flex flex-col items-center text-center p-10"
+          style={{
+            background: 'rgba(255, 255, 255, 0.05)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            boxShadow: '0 0 40px rgba(230, 255, 0, 0.1)',
+          }}
+        >
           <MessageCircle size={48} style={{ color: '#E6FF00' }} className="mb-6" />
           <h2 className="section-heading text-3xl mb-4">Start Your Fitness Journey</h2>
           <p className="text-muted text-sm leading-relaxed mb-8">
@@ -70,7 +111,16 @@ export default function Contact() {
             href="https://api.whatsapp.com/send/?phone=919912223125&text&type=phone_number&app_absent=0"
             target="_blank"
             rel="noreferrer"
-            className="w-full bg-accent text-black font-bold text-sm uppercase tracking-widest py-4 text-center hover:opacity-90 transition-opacity block mb-4"
+            className="w-full bg-accent text-black font-bold text-sm uppercase tracking-widest py-4 text-center block mb-4"
+            style={{ transition: 'transform 0.2s ease, box-shadow 0.2s ease' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.boxShadow = '0 0 20px rgba(230,255,0,0.4)'
+              e.currentTarget.style.transform = 'scale(1.01)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.boxShadow = 'none'
+              e.currentTarget.style.transform = 'scale(1)'
+            }}
           >
             CHAT ON WHATSAPP →
           </a>
