@@ -23,6 +23,6 @@ app.include_router(auth_routes.router, prefix="/api/auth", tags=["auth"])
 app.include_router(classes_routes.router, prefix="/api/classes", tags=["classes"])
 app.include_router(pricing_routes.router, prefix="/api/pricing", tags=["pricing"])
 
-@app.get("/")
+@app.api_route("/", methods=["GET", "HEAD"])
 async def root():
     return {"status": "ok", "service": "fitness-lab-backend"}
