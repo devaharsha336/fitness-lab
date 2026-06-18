@@ -25,4 +25,4 @@ app.include_router(pricing_routes.router, prefix="/api/pricing", tags=["pricing"
 
 @app.get("/")
 async def root():
-    return {"status": "The Fitness Lab API is running"}
+    return {"status": "ok", "service": "fitness-lab-backend"}
