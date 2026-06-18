@@ -1,12 +1,19 @@
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routes import auth_routes, classes_routes, pricing_routes
 
-app = FastAPI(title="The Fitness Lab API")
+# Disable Swagger UI and ReDoc in production to avoid exposing API schema
+_debug = os.getenv("DEBUG", "false").lower() == "true"
+app = FastAPI(
+    title="The Fitness Lab API",
+    docs_url="/docs" if _debug else None,
+    redoc_url="/redoc" if _debug else None,
+)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["https://fitness-lab-ochre.vercel.app"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
-import { Instagram, Facebook, MessageCircle, MapPin, Dumbbell } from 'lucide-react'
+import { Instagram, Facebook, MessageCircle, MapPin, Dumbbell, X } from 'lucide-react'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
@@ -24,6 +25,13 @@ const CLASSES_FALLBACK = [
   { name: 'Functional Training', description: 'Train movements, not muscles', schedule: 'WED, SAT - 8:00 AM', image_url: '/images/functional_zone.jpg' },
   { name: 'Personal Training', description: 'One-on-one expert coaching', schedule: 'FLEXIBLE TIMING', image_url: '/images/full_gym_overview.jpg' },
 ]
+
+const PROGRAM_DETAILS = {
+  'Strength Training': 'Build muscle mass and increase raw power through progressive overload and compound lifts. Our sessions focus on squat, bench, deadlift, and accessory movements — suited for beginners and experienced lifters alike. Expect measurable strength gains within weeks of consistent training.',
+  'HIIT': 'Burn fat and boost cardiovascular fitness with high-intensity intervals designed to keep your heart rate elevated and your metabolism firing long after the session ends. Alternating explosive effort bursts with active recovery, HIIT is ideal for anyone looking to maximize results in minimum time.',
+  'Functional Training': 'Move better, feel stronger. Functional training develops coordination, mobility, and full-body strength using kettlebells, cables, and bodyweight exercises that mirror real-life movement patterns. Perfect for athletes and anyone who wants a body that performs as good as it looks.',
+  'Personal Training': 'Get results faster with a dedicated trainer designing your program around your specific goals, current fitness level, and schedule. One-on-one coaching ensures perfect form, consistent accountability, and a plan that evolves as you do.',
+}
 
 const STATS = [
   { value: 500, suffix: '+', label: 'Members' },
@@ -89,7 +97,94 @@ function StatCounter({ value, suffix, label }) {
   )
 }
 
-function ProgramCard({ cls, index }) {
+function ProgramModal({ program, onClose }) {
+  useEffect(() => {
+    const handleKey = (e) => { if (e.key === 'Escape') onClose() }
+    document.addEventListener('keydown', handleKey)
+    return () => document.removeEventListener('keydown', handleKey)
+  }, [onClose])
+
+  if (!program) return null
+
+  const fullDescription = PROGRAM_DETAILS[program.name] || program.description
+
+  return createPortal(
+    <div
+      style={{
+        position: 'fixed',
+        top: 0, left: 0, right: 0, bottom: 0,
+        zIndex: 9999,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '0 16px',
+        background: 'rgba(0,0,0,0.75)',
+        backdropFilter: 'blur(4px)',
+        WebkitBackdropFilter: 'blur(4px)',
+      }}
+      onClick={onClose}
+    >
+      <div
+        className="relative w-full max-w-lg p-8"
+        style={{
+          background: 'rgba(10,10,10,0.92)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          border: '1px solid rgba(230,255,0,0.3)',
+          animation: 'modalIn 0.25s ease forwards',
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-white hover:text-accent transition-colors"
+          aria-label="Close"
+        >
+          <X size={20} />
+        </button>
+
+        {/* Icon + Name */}
+        <Dumbbell size={24} style={{ color: '#E6FF00' }} className="mb-4" />
+        <h3 className="section-heading text-3xl mb-4">{program.name.toUpperCase()}</h3>
+
+        {/* Full description */}
+        <p className="text-muted leading-relaxed mb-6">{fullDescription}</p>
+
+        {/* Schedule */}
+        <p
+          className="text-xs font-medium tracking-widest uppercase mb-8 inline-block px-3 py-1"
+          style={{ color: '#E6FF00', border: '1px solid rgba(230,255,0,0.3)' }}
+        >
+          {program.schedule}
+        </p>
+
+        {/* Join Now CTA */}
+        <div className="block">
+          <a
+            href="https://api.whatsapp.com/send/?phone=919912223125&text&type=phone_number&app_absent=0"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-block bg-accent text-black font-body font-bold text-sm uppercase tracking-widest px-8 py-3"
+            style={{ transition: 'transform 0.2s ease, box-shadow 0.2s ease' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.boxShadow = '0 0 20px rgba(230,255,0,0.4)'
+              e.currentTarget.style.transform = 'scale(1.02)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.boxShadow = 'none'
+              e.currentTarget.style.transform = 'scale(1)'
+            }}
+          >
+            JOIN NOW →
+          </a>
+        </div>
+      </div>
+    </div>
+  , document.body)
+}
+
+function ProgramCard({ cls, index, onOpen }) {
   const ref = useScrollObserver(0.1)
 
   return (
@@ -101,6 +196,7 @@ function ProgramCard({ cls, index }) {
         transitionDelay: `${index * 0.15}s`,
         transition: 'opacity 0.7s ease, transform 0.7s ease, border-color 0.3s ease',
       }}
+      onClick={() => onOpen(cls)}
       onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'rgba(230,255,0,0.4)' }}
       onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)' }}
     >
@@ -124,6 +220,24 @@ function ProgramCard({ cls, index }) {
         <h3 className="section-heading text-2xl mb-1">{cls.name.toUpperCase()}</h3>
         <p className="text-muted text-sm mb-2">{cls.description}</p>
         <p className="text-xs font-medium tracking-widest uppercase" style={{ color: '#E6FF00' }}>{cls.schedule}</p>
+        <a
+          href="https://api.whatsapp.com/send/?phone=919912223125&text&type=phone_number&app_absent=0"
+          target="_blank"
+          rel="noreferrer"
+          className="inline-block mt-4 bg-accent text-black font-body font-bold text-xs uppercase tracking-widest px-5 py-2"
+          style={{ transition: 'transform 0.2s ease, box-shadow 0.2s ease' }}
+          onClick={(e) => e.stopPropagation()}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.boxShadow = '0 0 16px rgba(230,255,0,0.4)'
+            e.currentTarget.style.transform = 'scale(1.02)'
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.boxShadow = 'none'
+            e.currentTarget.style.transform = 'scale(1)'
+          }}
+        >
+          JOIN NOW →
+        </a>
       </div>
     </div>
   )
@@ -171,6 +285,7 @@ function PricingRow({ row, index }) {
 export default function Home() {
   const [classes, setClasses] = useState([])
   const [pricing, setPricing] = useState(PRICING_FALLBACK)
+  const [selectedProgram, setSelectedProgram] = useState(null)
 
   useEffect(() => {
     fetch(`${API}/api/classes`).then(r => r.json()).then(setClasses).catch(() => {})
@@ -212,6 +327,7 @@ export default function Home() {
 
   return (
     <>
+      <ProgramModal program={selectedProgram} onClose={() => setSelectedProgram(null)} />
       {/* HERO */}
       <section className="relative min-h-screen flex flex-col justify-center px-8 md:px-16 overflow-hidden">
         {/* Background with zoom animation */}
@@ -295,7 +411,9 @@ export default function Home() {
         <p ref={labelProgramsRef} className="section-label mb-3">What We Offer</p>
         <h2 ref={headingProgramsRef} className="section-heading text-5xl md:text-6xl mb-10">Our Programs</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {displayClasses.map((cls, i) => <ProgramCard key={cls.name} cls={cls} index={i} />)}
+          {displayClasses.map((cls, i) => (
+            <ProgramCard key={cls.name} cls={cls} index={i} onOpen={setSelectedProgram} />
+          ))}
         </div>
       </section>
 

@@ -100,26 +100,30 @@ export default function Pricing() {
         ))}
       </div>
 
-      {/* Table header */}
-      <div
-        className="grid mb-px"
-        style={{
-          gridTemplateColumns: 'repeat(5, 1fr)',
-          background: 'rgba(17,17,17,0.9)',
-          backdropFilter: 'blur(10px)',
-          WebkitBackdropFilter: 'blur(10px)',
-          borderBottom: '1px solid rgba(255,255,255,0.1)',
-          padding: '16px 24px',
-        }}
-      >
-        {COLS.map((h) => (
-          <div key={h} className="font-heading font-bold uppercase" style={{ color: '#E6FF00', fontSize: '0.85rem', letterSpacing: '0.1em' }}>{h}</div>
-        ))}
-      </div>
+      {/* Table — scrollable on mobile */}
+      <div className="overflow-x-auto">
+        {/* Table header */}
+        <div
+          className="grid mb-px"
+          style={{
+            gridTemplateColumns: 'repeat(5, 1fr)',
+            minWidth: '560px',
+            background: 'rgba(17,17,17,0.9)',
+            backdropFilter: 'blur(10px)',
+            WebkitBackdropFilter: 'blur(10px)',
+            borderBottom: '1px solid rgba(255,255,255,0.1)',
+            padding: '16px 24px',
+          }}
+        >
+          {COLS.map((h) => (
+            <div key={h} className="font-heading font-bold uppercase" style={{ color: '#E6FF00', fontSize: '0.85rem', letterSpacing: '0.1em' }}>{h}</div>
+          ))}
+        </div>
 
-      {/* Rows */}
-      <div className="flex flex-col gap-px">
-        {pricing.map((row, i) => <PricingRow key={row.name} row={row} index={i} />)}
+        {/* Rows */}
+        <div className="flex flex-col gap-px" style={{ minWidth: '560px' }}>
+          {pricing.map((row, i) => <PricingRow key={row.name} row={row} index={i} />)}
+        </div>
       </div>
 
       <div className="text-center mt-12">
