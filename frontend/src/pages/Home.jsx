@@ -51,6 +51,22 @@ const PROGRAM_DETAILS = {
   'Group Workouts': 'Energetic group fitness classes led by motivating coaches in a community atmosphere. Train alongside like-minded people, push each other to new limits, and make fitness a social experience. Classes rotate weekly so you always have something fresh to look forward to.',
 }
 
+const IMAGE_MAP = {
+  'Personal Training': 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800&q=80',
+  'Body Transformation': 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=800&q=80',
+  'Weight Loss': 'https://images.unsplash.com/photo-1538805060514-97d9cc17730c?w=800&q=80',
+  'Weight Gain': 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&q=80',
+  'Cardio': 'https://images.unsplash.com/photo-1601422407692-ec4eeec1d9b3?w=800&q=80',
+  'Strength': 'https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?w=800&q=80',
+  'HIIT': 'https://images.unsplash.com/photo-1549060279-7e168fcee0c2?w=800&q=80',
+  'Circuit Training': 'https://images.unsplash.com/photo-1571388208497-71bedc66e932?w=800&q=80',
+  'Kick Boxing': 'https://images.unsplash.com/photo-1555597673-b21d5c935865?w=800&q=80',
+  'Hyrox Training': 'https://images.unsplash.com/photo-1533560904424-a0c61dc306fc?w=800&q=80',
+  'Yodha Training': 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&q=80',
+  'Hybrid Gym': 'https://images.unsplash.com/photo-1540497077202-7c8a3999166f?w=800&q=80',
+  'Group Workouts': 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800&q=80',
+}
+
 const STATS = [
   { value: 500, suffix: '+', label: 'Members' },
   { value: 5,   suffix: '+', label: 'Years Experience' },
@@ -336,8 +352,8 @@ export default function Home() {
   const [selectedProgram, setSelectedProgram] = useState(null)
 
   useEffect(() => {
-    fetch(`${API}/api/classes`).then(r => r.json()).then(data => { if (data.length >= 13) setClasses(data) }).catch(() => {})
-    fetch(`${API}/api/pricing`).then(r => r.json()).then(data => { if (data.length) setPricing(data) }).catch(() => {})
+    fetch(`${API}/api/classes`).then(r => r.json()).then(data => { if (Array.isArray(data) && data.length > 0) setClasses(data) }).catch(() => {})
+    fetch(`${API}/api/pricing`).then(r => r.json()).then(data => { if (Array.isArray(data) && data.length > 0) setPricing(data) }).catch(() => {})
   }, [])
 
   const labelProgramsRef = useRef(null)
@@ -371,7 +387,10 @@ export default function Home() {
     return () => observers.forEach((obs) => obs?.disconnect())
   }, [])
 
-  const displayClasses = classes.length ? classes : CLASSES_FALLBACK
+  const displayClasses = (classes.length ? classes : CLASSES_FALLBACK).map(cls => ({
+    ...cls,
+    image_url: IMAGE_MAP[cls.name] || cls.image_url,
+  }))
 
   return (
     <>
@@ -494,7 +513,7 @@ export default function Home() {
         <p ref={labelPricingRef} className="section-label mb-3">Membership Plans</p>
         <h2 ref={headingPricingRef} className="section-heading text-5xl md:text-6xl mb-10">Our Packages</h2>
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full" style={{ minWidth: '640px' }}>
             <thead>
               <tr className="border-b border-border">
                 {['Package', 'Monthly', 'Quarterly (3 months)', 'Half-Yearly (6 months)', 'Yearly (12 months)'].map((h) => (

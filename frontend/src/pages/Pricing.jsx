@@ -62,7 +62,7 @@ export default function Pricing() {
   const headingRef = useRef(null)
 
   useEffect(() => {
-    fetch(`${API}/api/pricing`).then(r => r.json()).then(data => { if (data.length) setPricing(data) }).catch(() => {})
+    fetch(`${API}/api/pricing`).then(r => r.json()).then(data => { if (Array.isArray(data) && data.length > 0) setPricing(data) }).catch(() => {})
   }, [])
 
   useEffect(() => {

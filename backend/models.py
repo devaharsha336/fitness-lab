@@ -15,7 +15,6 @@ class ClassUpdateModel(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
     schedule: Optional[str] = None
-    image_url: Optional[str] = None
 
 class PricingModel(BaseModel):
     name: str

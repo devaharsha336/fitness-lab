@@ -19,6 +19,22 @@ const FALLBACK = [
   { name: 'Group Workouts', description: 'Energetic group fitness classes led by motivating coaches in a community atmosphere. Train alongside like-minded people, push each other to new limits, and make fitness a social experience. Classes rotate weekly so you always have something fresh to look forward to.', schedule: 'Daily – 7:00 AM & 6:00 PM', image_url: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800&q=80' },
 ]
 
+const IMAGE_MAP = {
+  'Personal Training': 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800&q=80',
+  'Body Transformation': 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=800&q=80',
+  'Weight Loss': 'https://images.unsplash.com/photo-1538805060514-97d9cc17730c?w=800&q=80',
+  'Weight Gain': 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&q=80',
+  'Cardio': 'https://images.unsplash.com/photo-1601422407692-ec4eeec1d9b3?w=800&q=80',
+  'Strength': 'https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?w=800&q=80',
+  'HIIT': 'https://images.unsplash.com/photo-1549060279-7e168fcee0c2?w=800&q=80',
+  'Circuit Training': 'https://images.unsplash.com/photo-1571388208497-71bedc66e932?w=800&q=80',
+  'Kick Boxing': 'https://images.unsplash.com/photo-1555597673-b21d5c935865?w=800&q=80',
+  'Hyrox Training': 'https://images.unsplash.com/photo-1533560904424-a0c61dc306fc?w=800&q=80',
+  'Yodha Training': 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&q=80',
+  'Hybrid Gym': 'https://images.unsplash.com/photo-1540497077202-7c8a3999166f?w=800&q=80',
+  'Group Workouts': 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800&q=80',
+}
+
 function ClassCard({ cls, index }) {
   const ref = useRef(null)
   useEffect(() => {
@@ -100,7 +116,7 @@ export default function Classes() {
   const headingRef = useRef(null)
 
   useEffect(() => {
-    fetch(`${API}/api/classes`).then(r => r.json()).then(data => { if (data.length >= 13) setClasses(data) }).catch(() => {})
+    fetch(`${API}/api/classes`).then(r => r.json()).then(data => { if (Array.isArray(data) && data.length > 0) setClasses(data) }).catch(() => {})
   }, [])
 
   useEffect(() => {
@@ -121,7 +137,10 @@ export default function Classes() {
     return () => observers.forEach((obs) => obs?.disconnect())
   }, [])
 
-  const data = classes.length ? classes : FALLBACK
+  const data = (classes.length ? classes : FALLBACK).map(cls => ({
+    ...cls,
+    image_url: IMAGE_MAP[cls.name] || cls.image_url,
+  }))
 
   return (
     <div className="min-h-screen pt-24 pb-20 px-6 md:px-16 max-w-7xl mx-auto">

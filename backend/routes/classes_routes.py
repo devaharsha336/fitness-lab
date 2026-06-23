@@ -24,18 +24,26 @@ async def create_class(cls: ClassModel, _=Depends(get_current_user)):
 
 @router.put("/{class_id}")
 async def update_class(class_id: str, cls: ClassUpdateModel, _=Depends(get_current_user)):
+    try:
+        oid = ObjectId(class_id)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid class ID")
     updates = {k: v for k, v in cls.dict().items() if v is not None}
     if not updates:
         raise HTTPException(status_code=400, detail="No fields to update")
-    await classes_collection.update_one({"_id": ObjectId(class_id)}, {"$set": updates})
-    updated = await classes_collection.find_one({"_id": ObjectId(class_id)})
+    await classes_collection.update_one({"_id": oid}, {"$set": updates})
+    updated = await classes_collection.find_one({"_id": oid})
     if not updated:
         raise HTTPException(status_code=404, detail="Class not found")
     return serialize(updated)
 
 @router.delete("/{class_id}")
 async def delete_class(class_id: str, _=Depends(get_current_user)):
-    result = await classes_collection.delete_one({"_id": ObjectId(class_id)})
+    try:
+        oid = ObjectId(class_id)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid class ID")
+    result = await classes_collection.delete_one({"_id": oid})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Class not found")
     return {"message": "Deleted"}
