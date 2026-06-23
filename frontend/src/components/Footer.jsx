@@ -55,9 +55,15 @@ export default function Footer() {
             <MapPin size={14} className="mt-0.5 flex-shrink-0" />
             <span>PVSR Palace, 3rd & 4th Floor, Sri Ram Nagar Colony, Golden Temple Rd, Manikonda</span>
           </div>
-          <div className="flex items-center gap-2 text-muted text-sm">
-            <Phone size={14} />
-            <span>+91 99122 23125</span>
+          <div className="flex flex-col gap-1 text-muted text-sm">
+            <div className="flex items-center gap-2">
+              <Phone size={14} />
+              <a href="tel:+919912223125" className="hover:text-accent transition-colors">+91 99122 23125</a>
+            </div>
+            <div className="flex items-center gap-2">
+              <Phone size={14} />
+              <a href="tel:+918125034011" className="hover:text-accent transition-colors">+91 81250 34011</a>
+            </div>
           </div>
         </div>
       </div>

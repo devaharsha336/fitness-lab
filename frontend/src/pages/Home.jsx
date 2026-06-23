@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
-import { Instagram, Facebook, MessageCircle, MapPin, Dumbbell, X } from 'lucide-react'
+import { Instagram, Facebook, MessageCircle, MapPin, Dumbbell, X, Phone } from 'lucide-react'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
@@ -13,24 +13,42 @@ const SOCIAL = [
 ]
 
 const PRICING_FALLBACK = [
-  { name: 'Individual', bestPrice: false, monthly: '₹2,500/-', quarterly: '₹6,500/-', halfYearly: '₹10,500/-', yearly: '₹15,000/-' },
-  { name: 'Couple', bestPrice: true, monthly: '₹4,500/-', quarterly: '₹11,000/-', halfYearly: '₹18,000/-', yearly: '₹30,000/-' },
-  { name: 'Gold Personal Training', bestPrice: true, monthly: '₹7,000/-', quarterly: '₹20,000/-', halfYearly: '₹38,000/-', yearly: '₹70,000/-' },
-  { name: 'Platinum Personal Training', bestPrice: true, monthly: '₹15,000/-', quarterly: '₹40,000/-', halfYearly: '₹75,000/-', yearly: '₹1,20,000/-' },
+  { name: 'Individual (1 Person)', bestPrice: false, monthly: '₹2,500/-', quarterly: '₹7,000/-', halfYearly: '₹10,500/-', yearly: '₹15,000/-' },
+  { name: 'Couple (2 Persons)', bestPrice: true, monthly: '₹4,500/-', quarterly: '₹11,500/-', halfYearly: '₹20,000/-', yearly: '₹28,000/-' },
+  { name: 'Gold Personal Training (Sharing)', bestPrice: true, monthly: '₹8,000/-', quarterly: '₹20,000/-', halfYearly: '₹38,000/-', yearly: '₹70,000/-' },
+  { name: 'Platinum One to One Training', bestPrice: true, monthly: '₹15,000/-', quarterly: '₹40,000/-', halfYearly: '₹75,000/-', yearly: '₹1,20,000/-' },
 ]
 
 const CLASSES_FALLBACK = [
-  { name: 'Strength Training', description: 'Build muscle and strength', schedule: 'MON, THU - 7:30 AM', image_url: '/images/strength_weights.jpg' },
-  { name: 'HIIT', description: 'High intensity interval training', schedule: 'TUE, FRI - 6:00 AM', image_url: '/images/cardio_zone.jpg' },
-  { name: 'Functional Training', description: 'Train movements, not muscles', schedule: 'WED, SAT - 8:00 AM', image_url: '/images/functional_zone.jpg' },
-  { name: 'Personal Training', description: 'One-on-one expert coaching', schedule: 'FLEXIBLE TIMING', image_url: '/images/full_gym_overview.jpg' },
+  { name: 'Personal Training', description: 'One-on-one coaching tailored to your goals, fitness level, and schedule for maximum results.', schedule: 'FLEXIBLE TIMING', image_url: '/images/full_gym_overview.jpg' },
+  { name: 'Body Transformation', description: 'Reshape your physique through strength training, conditioning, and nutrition guidance.', schedule: 'MON, WED, FRI - 7:00 AM', image_url: '/images/strength_weights.jpg' },
+  { name: 'Weight Loss', description: 'Burn fat effectively and sustainably with cardio, resistance training, and dietary strategy.', schedule: 'TUE, THU, SAT - 6:30 AM', image_url: '/images/cardio_zone.jpg' },
+  { name: 'Weight Gain', description: 'Build lean mass efficiently with targeted hypertrophy training and structured nutrition.', schedule: 'MON, WED, FRI - 8:00 AM', image_url: '/images/strength_weights.jpg' },
+  { name: 'Cardio', description: 'Improve heart health, stamina, and endurance across all fitness levels.', schedule: 'MON TO SAT - 6:00 AM', image_url: '/images/cardio_zone.jpg' },
+  { name: 'Strength', description: 'Build raw power through compound lifts and structured periodization with expert coaching.', schedule: 'MON, THU - 7:30 AM', image_url: '/images/strength_weights.jpg' },
+  { name: 'HIIT', description: 'Torch calories and spike your metabolism with high-intensity interval training.', schedule: 'TUE, FRI - 6:00 AM', image_url: '/images/cardio_zone.jpg' },
+  { name: 'Circuit Training', description: 'Build total-body strength and endurance through dynamic multi-station sessions.', schedule: 'WED, SAT - 7:00 AM', image_url: '/images/functional_zone.jpg' },
+  { name: 'Kick Boxing', description: 'Full-body conditioning combining martial arts techniques with high-energy fitness.', schedule: 'TUE, SAT - 8:00 AM', image_url: '/images/functional_zone.jpg' },
+  { name: 'Hyrox Training', description: 'Race-ready preparation combining functional fitness stations with running endurance.', schedule: 'MON, THU - 6:30 AM', image_url: '/images/full_gym_overview.jpg' },
+  { name: 'Yodha Training', description: 'Warrior-style military conditioning to push your physical and mental limits.', schedule: 'WED, FRI - 6:00 AM', image_url: '/images/hero_banner.jpg' },
+  { name: 'Hybrid Gym', description: 'Combines strength and cardio conditioning for a powerful, well-rounded physique.', schedule: 'MON, WED, SAT - 7:00 AM', image_url: '/images/full_gym_overview.jpg' },
+  { name: 'Group Workouts', description: 'High-energy group sessions led by expert coaches to keep you consistent and progressing.', schedule: 'MON TO SAT - 8:00 AM', image_url: '/images/hero_banner.jpg' },
 ]
 
 const PROGRAM_DETAILS = {
-  'Strength Training': 'Build muscle mass and increase raw power through progressive overload and compound lifts. Our sessions focus on squat, bench, deadlift, and accessory movements — suited for beginners and experienced lifters alike. Expect measurable strength gains within weeks of consistent training.',
-  'HIIT': 'Burn fat and boost cardiovascular fitness with high-intensity intervals designed to keep your heart rate elevated and your metabolism firing long after the session ends. Alternating explosive effort bursts with active recovery, HIIT is ideal for anyone looking to maximize results in minimum time.',
-  'Functional Training': 'Move better, feel stronger. Functional training develops coordination, mobility, and full-body strength using kettlebells, cables, and bodyweight exercises that mirror real-life movement patterns. Perfect for athletes and anyone who wants a body that performs as good as it looks.',
-  'Personal Training': 'Get results faster with a dedicated trainer designing your program around your specific goals, current fitness level, and schedule. One-on-one coaching ensures perfect form, consistent accountability, and a plan that evolves as you do.',
+  'Personal Training': 'One-on-one coaching tailored to your goals, current fitness level, and schedule. Your dedicated trainer designs every session, tracks your progress, and adjusts your plan for maximum results. Flexible timings to fit your lifestyle.',
+  'Body Transformation': "A structured, results-driven program designed to reshape your physique through a combination of strength training, conditioning, and nutrition guidance. Whether you're starting from scratch or breaking through a plateau, this program delivers visible change. Ideal for those committed to a complete lifestyle overhaul.",
+  'Weight Loss': 'A calorie-burning, metabolism-boosting program combining cardio, resistance training, and dietary strategy to help you shed fat effectively and sustainably. Each session is designed to maximize energy expenditure while preserving lean muscle mass. Suitable for all fitness levels.',
+  'Weight Gain': 'A targeted muscle-building program focused on hypertrophy, progressive overload, and structured nutrition to help you gain lean mass efficiently. Includes guided strength sessions with expert coaching on form and recovery. Perfect for those looking to build size and strength simultaneously.',
+  'Cardio': 'Improve your heart health, stamina, and endurance with our dedicated cardio program featuring treadmill intervals, cycling, rowing, and more. Sessions are paced for all fitness levels — from beginners building base endurance to athletes pushing their aerobic limits. A perfect foundation for any fitness goal.',
+  'Strength': 'Build raw power and functional muscle through progressive overload, compound lifts, and structured periodization. Our certified coaches guide you through squat, bench, deadlift, and accessory work suited for beginners and seasoned lifters alike. Expect measurable strength gains within weeks.',
+  'HIIT': 'High-intensity interval training that torches calories, spikes your metabolism, and builds cardiovascular endurance in shorter sessions. Alternating explosive effort bursts with strategic recovery periods, HIIT is ideal for maximum results in minimum time. No two sessions are the same.',
+  'Circuit Training': 'Move through a series of resistance and cardio stations designed to build total-body strength and endurance simultaneously. Circuit training keeps your heart rate elevated while targeting multiple muscle groups in a single session. A great option for those who want variety and efficiency.',
+  'Kick Boxing': "Combine martial arts techniques with high-energy conditioning to build strength, coordination, and explosive power. Our kick boxing sessions are designed for fitness — no prior experience required — delivering a full-body workout that's as fun as it is effective.",
+  'Hyrox Training': "Purpose-built preparation for Hyrox competitions, combining functional fitness stations with running segments to build race-ready endurance and strength. Whether you're a first-timer or a seasoned competitor, our Hyrox program gets you across the finish line faster.",
+  'Yodha Training': 'An intense warrior-style conditioning program inspired by military fitness, combining bodyweight challenges, functional strength, and endurance drills. Yodha training is designed to push your physical and mental limits, building resilience and toughness from the inside out.',
+  'Hybrid Gym': 'The best of both worlds — combines strength training and cardio conditioning in a single, efficient program. Hybrid Gym is designed for those who refuse to compromise, building a body that is equally powerful and well-conditioned. Suitable for intermediate to advanced fitness enthusiasts.',
+  'Group Workouts': 'Train alongside a community of like-minded members in high-energy group sessions led by expert coaches. Group workouts combine motivation, accountability, and structured programming to keep you consistent and progressing. Available across multiple formats and fitness levels.',
 }
 
 const STATS = [
@@ -38,6 +56,36 @@ const STATS = [
   { value: 5,   suffix: '+', label: 'Years Experience' },
   { value: 10,  suffix: '+', label: 'Expert Trainers' },
 ]
+
+function TimingsBanner() {
+  const day = new Date().getDay()
+  const isSunday = day === 0
+  const hours = isSunday
+    ? 'Morning: 6:00 AM – 10:00 AM  ·  Evening: 5:00 PM – 9:00 PM'
+    : 'Morning: 5:30 AM – 12:00 PM  ·  Evening: 5:00 PM – 10:00 PM'
+  const dayLabel = isSunday ? 'Sunday Hours' : "Today's Hours (Mon–Sat)"
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        top: '64px',
+        left: 0,
+        right: 0,
+        zIndex: 40,
+        background: '#E6FF00',
+        color: '#000',
+        textAlign: 'center',
+        padding: '7px 16px',
+        fontSize: '0.72rem',
+        fontWeight: 700,
+        letterSpacing: '0.07em',
+        textTransform: 'uppercase',
+      }}
+    >
+      🕐 {dayLabel}: {hours}
+    </div>
+  )
+}
 
 function useScrollObserver(threshold = 0.15) {
   const ref = useRef(null)
@@ -327,6 +375,7 @@ export default function Home() {
 
   return (
     <>
+      <TimingsBanner />
       <ProgramModal program={selectedProgram} onClose={() => setSelectedProgram(null)} />
       {/* HERO */}
       <section className="relative min-h-screen flex flex-col justify-center px-8 md:px-16 overflow-hidden">
@@ -343,7 +392,7 @@ export default function Home() {
         <div className="absolute pointer-events-none" style={{ top: '50%', right: '35%', width: 80, height: 80, borderRadius: '50%', background: 'rgba(230,255,0,0.08)', filter: 'blur(15px)', animation: 'float 4s ease-in-out infinite 1s' }} />
         <div className="absolute pointer-events-none" style={{ bottom: '30%', right: '15%', width: 160, height: 160, borderRadius: '50%', background: 'rgba(230,255,0,0.04)', filter: 'blur(25px)', animation: 'float 6s ease-in-out infinite 0.5s' }} />
 
-        <div className="relative z-10 max-w-3xl pt-24">
+        <div className="relative z-10 max-w-3xl pt-32">
           <p className="section-label mb-6 hero-label">Premium Fitness Experience</p>
           <h1 className="section-heading" style={{ fontSize: 'clamp(64px, 10vw, 96px)', lineHeight: 1 }}>
             <span className="block hero-the">THE</span>
@@ -448,7 +497,7 @@ export default function Home() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-border">
-                {['Packages', 'Monthly', 'Quarterly', 'Half-Yearly', 'Yearly'].map((h) => (
+                {['Package', 'Monthly', 'Quarterly (3 months)', 'Half-Yearly (6 months)', 'Yearly (12 months)'].map((h) => (
                   <th key={h} className="font-heading font-bold uppercase text-left pb-4 pr-6" style={{ color: '#E6FF00', fontSize: '0.9rem', letterSpacing: '0.1em' }}>{h}</th>
                 ))}
               </tr>
@@ -491,6 +540,16 @@ export default function Home() {
             <div className="flex items-center gap-2 mt-4 text-muted text-sm">
               <MapPin size={14} />
               <span>PVSR Palace, Manikonda, Hyderabad</span>
+            </div>
+            <div className="flex flex-col gap-1 mt-3">
+              <div className="flex items-center gap-2 text-muted text-sm">
+                <Phone size={14} />
+                <a href="tel:+919912223125" className="hover:text-accent transition-colors">+91 99122 23125</a>
+              </div>
+              <div className="flex items-center gap-2 text-muted text-sm">
+                <Phone size={14} />
+                <a href="tel:+918125034011" className="hover:text-accent transition-colors">+91 81250 34011</a>
+              </div>
             </div>
           </div>
           <a

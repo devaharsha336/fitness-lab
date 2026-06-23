@@ -44,24 +44,45 @@ export default function Contact() {
               <MapPin size={16} style={{ color: '#E6FF00' }} className="mt-0.5 flex-shrink-0" />
               <span>PVSR Palace, 3rd & 4th Floor, Sri Ram Nagar Colony, Golden Temple Rd, Manikonda</span>
             </div>
-            <div className="flex items-center gap-3 text-muted text-sm">
-              <Phone size={16} style={{ color: '#E6FF00' }} />
-              <span>+91 99122 23125</span>
+            <div className="flex flex-col gap-2 text-muted text-sm">
+              <div className="flex items-center gap-3">
+                <Phone size={16} style={{ color: '#E6FF00' }} />
+                <a href="tel:+919912223125" className="hover:text-accent transition-colors">+91 99122 23125</a>
+              </div>
+              <div className="flex items-center gap-3">
+                <Phone size={16} style={{ color: '#E6FF00' }} />
+                <a href="tel:+918125034011" className="hover:text-accent transition-colors">+91 81250 34011</a>
+              </div>
             </div>
           </div>
 
           <div className="mb-8">
-            <p className="text-white font-medium uppercase tracking-widest text-sm mb-4">Hours</p>
-            <div className="flex items-start gap-3 text-muted text-sm">
-              <Clock size={16} style={{ color: '#E6FF00' }} className="mt-0.5 flex-shrink-0" />
-              <div>
-                <p className="text-white mb-1">Mon – Sat</p>
-                <p>Morning: 5:30 AM – 12:00 PM</p>
-                <p className="mb-2">Evening: 5:00 PM – 10:00 PM</p>
-                <p className="text-white mb-1">Sunday</p>
-                <p>Morning: 6:00 AM – 10:00 AM</p>
-                <p>Evening: 5:00 PM – 9:00 PM</p>
-              </div>
+            <p className="text-white font-medium uppercase tracking-widest text-sm mb-4 flex items-center gap-2">
+              <Clock size={16} style={{ color: '#E6FF00' }} />
+              Gym Timings
+            </p>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm" style={{ borderCollapse: 'collapse', minWidth: '300px' }}>
+                <thead>
+                  <tr style={{ background: '#E6FF00' }}>
+                    <th className="text-left py-2 px-3 text-black font-bold uppercase text-xs tracking-wider">Day</th>
+                    <th className="text-left py-2 px-3 text-black font-bold uppercase text-xs tracking-wider">Morning</th>
+                    <th className="text-left py-2 px-3 text-black font-bold uppercase text-xs tracking-wider">Evening</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+                    <td className="py-3 px-3 text-white font-medium">Mon – Sat</td>
+                    <td className="py-3 px-3 text-muted">5:30 AM – 12:00 PM</td>
+                    <td className="py-3 px-3 text-muted">5:00 PM – 10:00 PM</td>
+                  </tr>
+                  <tr>
+                    <td className="py-3 px-3 text-white font-medium">Sunday</td>
+                    <td className="py-3 px-3 text-muted">6:00 AM – 10:00 AM</td>
+                    <td className="py-3 px-3 text-muted">5:00 PM – 9:00 PM</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
 
@@ -124,7 +145,11 @@ export default function Contact() {
           >
             CHAT ON WHATSAPP →
           </a>
-          <p className="text-muted text-sm">+91 99122 23125</p>
+          <p className="text-muted text-sm">
+            <a href="tel:+919912223125" className="hover:text-accent transition-colors">+91 99122 23125</a>
+            {' '}|{' '}
+            <a href="tel:+918125034011" className="hover:text-accent transition-colors">+91 81250 34011</a>
+          </p>
         </div>
       </div>
     </div>

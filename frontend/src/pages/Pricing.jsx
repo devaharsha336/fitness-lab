@@ -4,21 +4,21 @@ import { Check } from 'lucide-react'
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
 const FALLBACK = [
-  { name: 'Individual', best_price: false, monthly: '₹2,500/-', quarterly: '₹6,500/-', half_yearly: '₹10,500/-', yearly: '₹15,000/-' },
-  { name: 'Couple', best_price: true, monthly: '₹4,500/-', quarterly: '₹11,000/-', half_yearly: '₹18,000/-', yearly: '₹30,000/-' },
-  { name: 'Gold Personal Training', best_price: true, monthly: '₹7,000/-', quarterly: '₹20,000/-', half_yearly: '₹38,000/-', yearly: '₹70,000/-' },
-  { name: 'Platinum Personal Training', best_price: true, monthly: '₹15,000/-', quarterly: '₹40,000/-', half_yearly: '₹75,000/-', yearly: '₹1,20,000/-' },
+  { name: 'Individual (1 Person)', best_price: false, monthly: '₹2,500/-', quarterly: '₹7,000/-', half_yearly: '₹10,500/-', yearly: '₹15,000/-' },
+  { name: 'Couple (2 Persons)', best_price: true, monthly: '₹4,500/-', quarterly: '₹11,500/-', half_yearly: '₹20,000/-', yearly: '₹28,000/-' },
+  { name: 'Gold Personal Training (Sharing)', best_price: true, monthly: '₹8,000/-', quarterly: '₹20,000/-', half_yearly: '₹38,000/-', yearly: '₹70,000/-' },
+  { name: 'Platinum One to One Training', best_price: true, monthly: '₹15,000/-', quarterly: '₹40,000/-', half_yearly: '₹75,000/-', yearly: '₹1,20,000/-' },
 ]
 
-const PERKS = [
-  'Access to all gym equipment',
-  'Locker room & shower facilities',
-  'Unlimited class bookings',
-  'Fitness progress tracking',
-  'Nutrition guidance',
+const INCLUDES = [
+  'Modern Equipment',
+  'Expert Trainers',
+  'Personalized Workout Plan',
+  'Diet Guidance',
+  'Locker & Shower Facility',
 ]
 
-const COLS = ['Package', 'Monthly', 'Quarterly', 'Half-Yearly', 'Yearly']
+const COLS = ['Package', 'Monthly', 'Quarterly (3 months)', 'Half-Yearly (6 months)', 'Yearly (12 months)']
 
 function PricingRow({ row, index }) {
   const ref = useRef(null)
@@ -34,26 +34,25 @@ function PricingRow({ row, index }) {
   }, [])
 
   return (
-    <div
+    <tr
       ref={ref}
-      className="grid animate-from-left pricing-row"
+      className="animate-from-left pricing-row"
       style={{
-        gridTemplateColumns: 'repeat(5, 1fr)',
         transitionDelay: `${index * 0.1}s`,
-        padding: '20px 24px',
+        borderBottom: '1px solid rgba(255,255,255,0.06)',
       }}
     >
-      <div>
+      <td className="py-4 px-4" style={{ borderRight: '1px solid rgba(255,255,255,0.06)' }}>
         <span className="text-white font-medium">{row.name}</span>
         {row.best_price && (
           <span className="block text-xs font-bold uppercase tracking-wider mt-0.5" style={{ color: '#E6FF00' }}>Best Price</span>
         )}
-      </div>
-      <div className="text-muted font-medium self-center">{row.monthly}</div>
-      <div className="text-muted font-medium self-center">{row.quarterly}</div>
-      <div className="text-muted font-medium self-center">{row.half_yearly}</div>
-      <div className="text-muted font-medium self-center">{row.yearly}</div>
-    </div>
+      </td>
+      <td className="py-4 px-4 text-muted font-medium" style={{ borderRight: '1px solid rgba(255,255,255,0.06)' }}>{row.monthly}</td>
+      <td className="py-4 px-4 text-muted font-medium" style={{ borderRight: '1px solid rgba(255,255,255,0.06)' }}>{row.quarterly}</td>
+      <td className="py-4 px-4 text-muted font-medium" style={{ borderRight: '1px solid rgba(255,255,255,0.06)' }}>{row.half_yearly}</td>
+      <td className="py-4 px-4 text-muted font-medium">{row.yearly}</td>
+    </tr>
   )
 }
 
@@ -90,43 +89,52 @@ export default function Pricing() {
       <h1 ref={headingRef} className="section-heading text-5xl md:text-7xl mb-4">Our Packages</h1>
       <p className="text-muted mb-12 max-w-xl">All memberships include full access to our facility. Choose the plan that works for you.</p>
 
-      {/* Perks */}
-      <div className="flex flex-wrap gap-4 mb-12">
-        {PERKS.map((perk) => (
-          <div key={perk} className="flex items-center gap-2 text-sm text-muted">
-            <Check size={14} style={{ color: '#E6FF00' }} />
-            {perk}
-          </div>
-        ))}
-      </div>
-
-      {/* Table — scrollable on mobile */}
-      <div className="overflow-x-auto">
-        {/* Table header */}
-        <div
-          className="grid mb-px"
+      {/* Pricing Table */}
+      <div className="overflow-x-auto mb-12">
+        <table
+          className="w-full"
           style={{
-            gridTemplateColumns: 'repeat(5, 1fr)',
-            minWidth: '560px',
-            background: 'rgba(17,17,17,0.9)',
+            borderCollapse: 'collapse',
+            minWidth: '640px',
+            background: 'rgba(10,10,10,0.85)',
             backdropFilter: 'blur(10px)',
             WebkitBackdropFilter: 'blur(10px)',
-            borderBottom: '1px solid rgba(255,255,255,0.1)',
-            padding: '16px 24px',
+            border: '1px solid rgba(255,255,255,0.08)',
           }}
         >
-          {COLS.map((h) => (
-            <div key={h} className="font-heading font-bold uppercase" style={{ color: '#E6FF00', fontSize: '0.85rem', letterSpacing: '0.1em' }}>{h}</div>
-          ))}
-        </div>
+          <thead>
+            <tr style={{ background: '#E6FF00' }}>
+              {COLS.map((h) => (
+                <th
+                  key={h}
+                  className="text-left py-4 px-4 text-black font-heading font-bold uppercase"
+                  style={{ fontSize: '0.78rem', letterSpacing: '0.08em', borderRight: '1px solid rgba(0,0,0,0.12)' }}
+                >
+                  {h}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {pricing.map((row, i) => <PricingRow key={row.name} row={row} index={i} />)}
+          </tbody>
+        </table>
+      </div>
 
-        {/* Rows */}
-        <div className="flex flex-col gap-px" style={{ minWidth: '560px' }}>
-          {pricing.map((row, i) => <PricingRow key={row.name} row={row} index={i} />)}
+      {/* All Packages Include */}
+      <div className="mb-12 p-6" style={{ border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(17,17,17,0.5)' }}>
+        <p className="font-heading font-bold uppercase tracking-widest text-sm mb-5" style={{ color: '#E6FF00' }}>All Packages Include</p>
+        <div className="flex flex-wrap gap-x-8 gap-y-3">
+          {INCLUDES.map((item) => (
+            <div key={item} className="flex items-center gap-2 text-sm text-muted">
+              <Check size={14} style={{ color: '#E6FF00', flexShrink: 0 }} />
+              {item}
+            </div>
+          ))}
         </div>
       </div>
 
-      <div className="text-center mt-12">
+      <div className="text-center mt-4">
         <p className="text-muted text-sm mb-6">Ready to join? Message us on WhatsApp to book your membership.</p>
         <a
           href="https://api.whatsapp.com/send/?phone=919912223125&text&type=phone_number&app_absent=0"
