@@ -13,7 +13,11 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://fitness-lab-ochre.vercel.app"],
+    allow_origins=[
+        "https://fitness-lab-ochre.vercel.app",
+        "https://thefitnesslab.co.in",
+        "https://www.thefitnesslab.co.in",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
