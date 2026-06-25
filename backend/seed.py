@@ -97,7 +97,7 @@ CLASSES = [
 PRICING = [
     {
         "name": "Individual (1 Person)",
-        "best_price": False,
+        "is_featured": False,
         "monthly": "₹2,500/-",
         "quarterly": "₹7,000/-",
         "half_yearly": "₹10,500/-",
@@ -105,7 +105,7 @@ PRICING = [
     },
     {
         "name": "Couple (2 Persons)",
-        "best_price": True,
+        "is_featured": True,
         "monthly": "₹4,500/-",
         "quarterly": "₹11,500/-",
         "half_yearly": "₹20,000/-",
@@ -113,7 +113,7 @@ PRICING = [
     },
     {
         "name": "Gold Personal Training (Sharing)",
-        "best_price": True,
+        "is_featured": True,
         "monthly": "₹8,000/-",
         "quarterly": "₹20,000/-",
         "half_yearly": "₹38,000/-",
@@ -121,7 +121,7 @@ PRICING = [
     },
     {
         "name": "Platinum One to One Training",
-        "best_price": True,
+        "is_featured": True,
         "monthly": "₹15,000/-",
         "quarterly": "₹40,000/-",
         "half_yearly": "₹75,000/-",

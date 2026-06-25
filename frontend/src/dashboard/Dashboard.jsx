@@ -151,9 +151,18 @@ function ProgramsTab({ toast }) {
   )
 }
 
+const PRICE_FIELDS = [
+  { key: 'monthly', label: 'Monthly' },
+  { key: 'quarterly', label: 'Quarterly' },
+  { key: 'half_yearly', label: 'Half-Yearly' },
+  { key: 'yearly', label: 'Yearly' },
+]
+
 function PricingTab({ toast }) {
   const [pricing, setPricing] = useState([])
   const [edits, setEdits] = useState({})
+  const [adding, setAdding] = useState(false)
+  const [newForm, setNewForm] = useState({ name: '', monthly: '', quarterly: '', half_yearly: '', yearly: '', is_featured: false })
 
   useEffect(() => { loadPricing() }, [])
 
@@ -171,33 +180,74 @@ function PricingTab({ toast }) {
 
   async function savePricing(id) {
     const res = await fetch(`${API}/api/pricing/${id}`, { method: 'PUT', headers: authHeaders(), body: JSON.stringify(edits[id]) })
-    if (res.ok) toast('Pricing updated', 'success')
+    if (res.ok) { toast('Pricing updated', 'success'); loadPricing() }
     else toast('Update failed', 'error')
+  }
+
+  async function deletePricing(id, name) {
+    if (!window.confirm(`Delete "${name}"? This will remove it from the public pricing page.`)) return
+    const res = await fetch(`${API}/api/pricing/${id}`, { method: 'DELETE', headers: authHeaders() })
+    if (res.ok) { toast('Package deleted', 'success'); loadPricing() }
+    else toast('Delete failed', 'error')
+  }
+
+  async function addPricing() {
+    const res = await fetch(`${API}/api/pricing`, { method: 'POST', headers: authHeaders(), body: JSON.stringify(newForm) })
+    if (res.ok) {
+      toast('Package added', 'success')
+      setAdding(false)
+      setNewForm({ name: '', monthly: '', quarterly: '', half_yearly: '', yearly: '', is_featured: false })
+      loadPricing()
+    } else toast('Add failed', 'error')
   }
 
   return (
     <div>
-      <h2 className="section-heading text-2xl mb-6">Pricing Manager</h2>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="section-heading text-2xl">Pricing Manager</h2>
+        <button onClick={() => setAdding(true)} className="flex items-center gap-2 bg-accent text-black text-xs font-bold uppercase tracking-widest px-4 py-2">
+          <Plus size={14} /> Add Package
+        </button>
+      </div>
+
       <div className="flex flex-col gap-4">
         {pricing.map((pkg) => (
           <div key={pkg.id} className="p-6" style={{ background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.08)' }}>
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <p className="text-white font-medium">{pkg.name}</p>
-                {pkg.best_price && <span className="text-xs" style={{ color: '#E6FF00' }}>Best Price</span>}
+            <div className="flex items-start justify-between gap-4 mb-4">
+              <div className="flex-1">
+                <input
+                  type="text"
+                  value={edits[pkg.id]?.name || ''}
+                  onChange={(e) => setEdits({ ...edits, [pkg.id]: { ...edits[pkg.id], name: e.target.value } })}
+                  className="bg-black border border-border text-white text-sm px-3 py-2 focus:outline-none focus:border-accent w-full mb-2"
+                />
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={edits[pkg.id]?.is_featured ?? false}
+                    onChange={(e) => setEdits({ ...edits, [pkg.id]: { ...edits[pkg.id], is_featured: e.target.checked } })}
+                    className="accent-yellow-300"
+                  />
+                  <span className="text-xs text-muted">Featured (highlighted on pricing page)</span>
+                </label>
               </div>
-              <button onClick={() => savePricing(pkg.id)} className="flex items-center gap-1 bg-accent text-black text-xs font-bold uppercase px-4 py-2">
-                <Save size={12} /> Save
-              </button>
+              <div className="flex gap-2 flex-shrink-0">
+                <button onClick={() => savePricing(pkg.id)} className="flex items-center gap-1 bg-accent text-black text-xs font-bold uppercase px-4 py-2">
+                  <Save size={12} /> Save
+                </button>
+                <button onClick={() => deletePricing(pkg.id, edits[pkg.id]?.name)} className="flex items-center gap-1 border border-red-800 text-red-400 text-xs uppercase px-4 py-2 hover:bg-red-900/20 transition-colors">
+                  <Trash2 size={12} /> Delete
+                </button>
+              </div>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {['monthly', 'quarterly', 'half_yearly', 'yearly'].map((field) => (
-                <div key={field}>
-                  <label className="section-label text-xs mb-1 block">{field.replace('_', ' ')}</label>
+              {PRICE_FIELDS.map(({ key, label }) => (
+                <div key={key}>
+                  <label className="section-label text-xs mb-1 block">{label}</label>
                   <input
                     type="text"
-                    value={edits[pkg.id]?.[field] || ''}
-                    onChange={(e) => setEdits({ ...edits, [pkg.id]: { ...edits[pkg.id], [field]: e.target.value } })}
+                    value={edits[pkg.id]?.[key] || ''}
+                    onChange={(e) => setEdits({ ...edits, [pkg.id]: { ...edits[pkg.id], [key]: e.target.value } })}
                     className="w-full bg-black border border-border text-white text-sm px-3 py-2 focus:outline-none focus:border-accent"
                   />
                 </div>
@@ -206,6 +256,48 @@ function PricingTab({ toast }) {
           </div>
         ))}
       </div>
+
+      {adding && (
+        <div className="mt-4 p-6" style={{ background: 'rgba(230,255,0,0.03)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', border: '1px solid rgba(230,255,0,0.2)' }}>
+          <h3 className="text-white font-medium mb-4">New Package</h3>
+          <div className="flex flex-col gap-3 mb-4">
+            <input
+              type="text"
+              placeholder="Package name"
+              value={newForm.name}
+              onChange={(e) => setNewForm({ ...newForm, name: e.target.value })}
+              className="bg-black border border-border text-white text-sm px-3 py-2 focus:outline-none focus:border-accent"
+            />
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {PRICE_FIELDS.map(({ key, label }) => (
+                <div key={key}>
+                  <label className="section-label text-xs mb-1 block">{label}</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. ₹2,500/-"
+                    value={newForm[key]}
+                    onChange={(e) => setNewForm({ ...newForm, [key]: e.target.value })}
+                    className="w-full bg-black border border-border text-white text-sm px-3 py-2 focus:outline-none focus:border-accent"
+                  />
+                </div>
+              ))}
+            </div>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={newForm.is_featured}
+                onChange={(e) => setNewForm({ ...newForm, is_featured: e.target.checked })}
+                className="accent-yellow-300"
+              />
+              <span className="text-xs text-muted">Featured (highlighted on pricing page)</span>
+            </label>
+          </div>
+          <div className="flex gap-3">
+            <button onClick={addPricing} className="bg-accent text-black text-xs font-bold uppercase px-5 py-2">Save</button>
+            <button onClick={() => { setAdding(false); setNewForm({ name: '', monthly: '', quarterly: '', half_yearly: '', yearly: '', is_featured: false }) }} className="border border-border text-muted text-xs uppercase px-5 py-2">Cancel</button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -18,7 +18,7 @@ class ClassUpdateModel(BaseModel):
 
 class PricingModel(BaseModel):
     name: str
-    best_price: bool = False
+    is_featured: bool = False
     monthly: str
     quarterly: str
     half_yearly: str
@@ -26,7 +26,7 @@ class PricingModel(BaseModel):
 
 class PricingUpdateModel(BaseModel):
     name: Optional[str] = None
-    best_price: Optional[bool] = None
+    is_featured: Optional[bool] = None
     monthly: Optional[str] = None
     quarterly: Optional[str] = None
     half_yearly: Optional[str] = None

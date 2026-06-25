@@ -13,10 +13,10 @@ const SOCIAL = [
 ]
 
 const PRICING_FALLBACK = [
-  { name: 'Individual (1 Person)', bestPrice: false, monthly: '₹2,500/-', quarterly: '₹7,000/-', halfYearly: '₹10,500/-', yearly: '₹15,000/-' },
-  { name: 'Couple (2 Persons)', bestPrice: true, monthly: '₹4,500/-', quarterly: '₹11,500/-', halfYearly: '₹20,000/-', yearly: '₹28,000/-' },
-  { name: 'Gold Personal Training (Sharing)', bestPrice: true, monthly: '₹8,000/-', quarterly: '₹20,000/-', halfYearly: '₹38,000/-', yearly: '₹70,000/-' },
-  { name: 'Platinum One to One Training', bestPrice: true, monthly: '₹15,000/-', quarterly: '₹40,000/-', halfYearly: '₹75,000/-', yearly: '₹1,20,000/-' },
+  { name: 'Individual (1 Person)', is_featured: false, monthly: '₹2,500/-', quarterly: '₹7,000/-', half_yearly: '₹10,500/-', yearly: '₹15,000/-' },
+  { name: 'Couple (2 Persons)', is_featured: true, monthly: '₹4,500/-', quarterly: '₹11,500/-', half_yearly: '₹20,000/-', yearly: '₹28,000/-' },
+  { name: 'Gold Personal Training (Sharing)', is_featured: true, monthly: '₹8,000/-', quarterly: '₹20,000/-', half_yearly: '₹38,000/-', yearly: '₹70,000/-' },
+  { name: 'Platinum One to One Training', is_featured: true, monthly: '₹15,000/-', quarterly: '₹40,000/-', half_yearly: '₹75,000/-', yearly: '₹1,20,000/-' },
 ]
 
 const CLASSES_FALLBACK = [
@@ -334,13 +334,13 @@ function PricingRow({ row, index }) {
     >
       <td className="py-4 pr-6">
         <span className="text-white font-medium">{row.name}</span>
-        {(row.best_price || row.bestPrice) && (
-          <span className="block text-xs font-bold uppercase tracking-wider" style={{ color: '#E6FF00' }}>Best Price</span>
+        {row.is_featured && (
+          <span className="block text-xs font-bold uppercase tracking-wider" style={{ color: '#E6FF00' }}>Featured</span>
         )}
       </td>
       <td className="py-4 pr-6 text-muted">{row.monthly}</td>
       <td className="py-4 pr-6 text-muted">{row.quarterly}</td>
-      <td className="py-4 pr-6 text-muted">{row.half_yearly || row.halfYearly}</td>
+      <td className="py-4 pr-6 text-muted">{row.half_yearly}</td>
       <td className="py-4 text-muted">{row.yearly}</td>
     </tr>
   )

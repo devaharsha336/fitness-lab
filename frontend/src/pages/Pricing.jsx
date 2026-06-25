@@ -4,10 +4,10 @@ import { Check } from 'lucide-react'
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
 const FALLBACK = [
-  { name: 'Individual (1 Person)', best_price: false, monthly: '₹2,500/-', quarterly: '₹7,000/-', half_yearly: '₹10,500/-', yearly: '₹15,000/-' },
-  { name: 'Couple (2 Persons)', best_price: true, monthly: '₹4,500/-', quarterly: '₹11,500/-', half_yearly: '₹20,000/-', yearly: '₹28,000/-' },
-  { name: 'Gold Personal Training (Sharing)', best_price: true, monthly: '₹8,000/-', quarterly: '₹20,000/-', half_yearly: '₹38,000/-', yearly: '₹70,000/-' },
-  { name: 'Platinum One to One Training', best_price: true, monthly: '₹15,000/-', quarterly: '₹40,000/-', half_yearly: '₹75,000/-', yearly: '₹1,20,000/-' },
+  { name: 'Individual (1 Person)', is_featured: false, monthly: '₹2,500/-', quarterly: '₹7,000/-', half_yearly: '₹10,500/-', yearly: '₹15,000/-' },
+  { name: 'Couple (2 Persons)', is_featured: true, monthly: '₹4,500/-', quarterly: '₹11,500/-', half_yearly: '₹20,000/-', yearly: '₹28,000/-' },
+  { name: 'Gold Personal Training (Sharing)', is_featured: true, monthly: '₹8,000/-', quarterly: '₹20,000/-', half_yearly: '₹38,000/-', yearly: '₹70,000/-' },
+  { name: 'Platinum One to One Training', is_featured: true, monthly: '₹15,000/-', quarterly: '₹40,000/-', half_yearly: '₹75,000/-', yearly: '₹1,20,000/-' },
 ]
 
 const INCLUDES = [
@@ -44,8 +44,8 @@ function PricingRow({ row, index }) {
     >
       <td className="py-4 px-4" style={{ borderRight: '1px solid rgba(255,255,255,0.06)' }}>
         <span className="text-white font-medium">{row.name}</span>
-        {row.best_price && (
-          <span className="block text-xs font-bold uppercase tracking-wider mt-0.5" style={{ color: '#E6FF00' }}>Best Price</span>
+        {row.is_featured && (
+          <span className="block text-xs font-bold uppercase tracking-wider mt-0.5" style={{ color: '#E6FF00' }}>Featured</span>
         )}
       </td>
       <td className="py-4 px-4 text-muted font-medium" style={{ borderRight: '1px solid rgba(255,255,255,0.06)' }}>{row.monthly}</td>
