@@ -3,14 +3,16 @@ import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
 import { Instagram, Facebook, MessageCircle, MapPin, Dumbbell, X, Phone } from 'lucide-react'
 import { useScrollReveal } from '../hooks/useScrollAnimation'
+import CTAButtons, { JoinNowButton, FillFormButton, FillFormLink } from '../components/CTAButtons'
+import { WHATSAPP_URL, SOCIAL_LINKS } from '../config/site'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
 const SOCIAL = [
-  { icon: Instagram, href: 'https://www.instagram.com/thefitnesslabgym?utm_source=qr&igsh=MWRwc3ljbXV2eHN1ZA%3D%3D', label: 'Instagram' },
-  { icon: Facebook, href: 'https://www.facebook.com/thefitnesslabfl?rdid=I0DAc5rDNaR39ix5&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F14atX1FapyC%2F', label: 'Facebook' },
-  { icon: MessageCircle, href: 'https://api.whatsapp.com/send/?phone=919912223125&text&type=phone_number&app_absent=0', label: 'WhatsApp' },
-  { icon: MapPin, href: 'https://share.google/HdkgsfHTe9xOIv1ze', label: 'Maps' },
+  { icon: Instagram, href: SOCIAL_LINKS.instagram, label: 'Instagram' },
+  { icon: Facebook, href: SOCIAL_LINKS.facebook, label: 'Facebook' },
+  { icon: MessageCircle, href: SOCIAL_LINKS.whatsapp, label: 'WhatsApp' },
+  { icon: MapPin, href: SOCIAL_LINKS.maps, label: 'Maps' },
 ]
 
 const PRICING_FALLBACK = [
@@ -217,26 +219,8 @@ function ProgramModal({ program, onClose }) {
           {program.schedule}
         </p>
 
-        {/* Join Now CTA */}
-        <div className="block">
-          <a
-            href="https://api.whatsapp.com/send/?phone=919912223125&text&type=phone_number&app_absent=0"
-            target="_blank"
-            rel="noreferrer"
-            className="inline-block bg-accent text-black font-body font-bold text-sm uppercase tracking-widest px-8 py-3"
-            style={{ transition: 'transform 0.2s ease, box-shadow 0.2s ease' }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.boxShadow = '0 0 20px rgba(230,255,0,0.4)'
-              e.currentTarget.style.transform = 'scale(1.02)'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.boxShadow = 'none'
-              e.currentTarget.style.transform = 'scale(1)'
-            }}
-          >
-            JOIN NOW →
-          </a>
-        </div>
+        {/* Join Now / Fill the Form CTAs */}
+        <CTAButtons joinLabel="JOIN NOW →" />
       </div>
     </div>
   , document.body)
@@ -278,24 +262,29 @@ function ProgramCard({ cls, index, onOpen }) {
         <h3 className="section-heading text-2xl mb-1">{cls.name.toUpperCase()}</h3>
         <p className="text-muted text-sm mb-2">{cls.description}</p>
         <p className="text-xs font-medium tracking-widest uppercase" style={{ color: '#E6FF00' }}>{cls.schedule}</p>
-        <a
-          href="https://api.whatsapp.com/send/?phone=919912223125&text&type=phone_number&app_absent=0"
-          target="_blank"
-          rel="noreferrer"
-          className="inline-block mt-4 bg-accent text-black font-body font-bold text-xs uppercase tracking-widest px-5 py-2"
-          style={{ transition: 'transform 0.2s ease, box-shadow 0.2s ease' }}
-          onClick={(e) => e.stopPropagation()}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.boxShadow = '0 0 16px rgba(230,255,0,0.4)'
-            e.currentTarget.style.transform = 'scale(1.02)'
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.boxShadow = 'none'
-            e.currentTarget.style.transform = 'scale(1)'
-          }}
-        >
-          JOIN NOW →
-        </a>
+        {/* Existing button kept as-is; the form gets a compact text link so the
+            card layout is unchanged. */}
+        <div className="mt-4 flex flex-wrap items-center gap-4">
+          <a
+            href={WHATSAPP_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="cta-btn inline-block bg-accent text-black font-body font-bold text-xs uppercase tracking-widest px-5 py-2"
+            style={{ transition: 'transform 0.2s ease, box-shadow 0.2s ease' }}
+            onClick={(e) => e.stopPropagation()}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.boxShadow = '0 0 16px rgba(230,255,0,0.4)'
+              e.currentTarget.style.transform = 'scale(1.02)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.boxShadow = 'none'
+              e.currentTarget.style.transform = 'scale(1)'
+            }}
+          >
+            JOIN NOW →
+          </a>
+          <FillFormLink />
+        </div>
       </div>
     </div>
   )
@@ -393,23 +382,8 @@ export default function Home() {
             Where science meets sweat. Transform your body with world-class training, cutting-edge equipment, and relentless discipline.
           </p>
           <div className="flex flex-wrap gap-4 hero-btns">
-            <a
-              href="https://api.whatsapp.com/send/?phone=919912223125&text&type=phone_number&app_absent=0"
-              target="_blank"
-              rel="noreferrer"
-              className="bg-accent text-black font-body font-bold text-sm uppercase tracking-widest px-7 py-3"
-              style={{ transition: 'transform 0.2s ease, box-shadow 0.2s ease' }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.boxShadow = '0 0 20px rgba(230,255,0,0.4)'
-                e.currentTarget.style.transform = 'scale(1.02)'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.boxShadow = 'none'
-                e.currentTarget.style.transform = 'scale(1)'
-              }}
-            >
-              JOIN NOW →
-            </a>
+            <JoinNowButton label="JOIN NOW →" />
+            <FillFormButton />
             <Link
               to="/classes"
               className="border border-white text-white font-body font-medium text-sm uppercase tracking-widest px-7 py-3 hover:border-accent hover:text-accent transition-colors"
@@ -499,24 +473,8 @@ export default function Home() {
             </tbody>
           </table>
         </div>
-        <div className="text-center mt-10">
-          <a
-            href="https://api.whatsapp.com/send/?phone=919912223125&text&type=phone_number&app_absent=0"
-            target="_blank"
-            rel="noreferrer"
-            className="inline-block bg-accent text-black font-bold text-sm uppercase tracking-widest px-10 py-3"
-            style={{ transition: 'transform 0.2s ease, box-shadow 0.2s ease' }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.boxShadow = '0 0 20px rgba(230,255,0,0.4)'
-              e.currentTarget.style.transform = 'scale(1.02)'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.boxShadow = 'none'
-              e.currentTarget.style.transform = 'scale(1)'
-            }}
-          >
-            BOOK NOW →
-          </a>
+        <div className="mt-10">
+          <CTAButtons joinLabel="BOOK NOW →" size="lg" className="justify-center" />
         </div>
       </section>
 
@@ -542,23 +500,11 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <a
-            href="https://api.whatsapp.com/send/?phone=919912223125&text&type=phone_number&app_absent=0"
-            target="_blank"
-            rel="noreferrer"
-            className="flex-shrink-0 bg-accent text-black font-bold text-sm uppercase tracking-widest px-10 py-4"
-            style={{ transition: 'transform 0.2s ease, box-shadow 0.2s ease' }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.boxShadow = '0 0 20px rgba(230,255,0,0.4)'
-              e.currentTarget.style.transform = 'scale(1.02)'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.boxShadow = 'none'
-              e.currentTarget.style.transform = 'scale(1)'
-            }}
-          >
-            CHAT ON WHATSAPP →
-          </a>
+          <CTAButtons
+            joinLabel="CHAT ON WHATSAPP →"
+            size="lg"
+            className="flex-shrink-0"
+          />
         </div>
       </section>
     </>

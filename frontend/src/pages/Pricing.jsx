@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Check } from 'lucide-react'
 import { useScrollReveal } from '../hooks/useScrollAnimation'
+import CTAButtons from '../components/CTAButtons'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
@@ -108,24 +109,10 @@ export default function Pricing() {
       </div>
 
       <div className="text-center mt-4">
-        <p className="text-muted text-sm mb-6">Ready to join? Message us on WhatsApp to book your membership.</p>
-        <a
-          href="https://api.whatsapp.com/send/?phone=919912223125&text&type=phone_number&app_absent=0"
-          target="_blank"
-          rel="noreferrer"
-          className="inline-block bg-accent text-black font-bold text-sm uppercase tracking-widest px-12 py-4"
-          style={{ transition: 'transform 0.2s ease, box-shadow 0.2s ease' }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.boxShadow = '0 0 20px rgba(230,255,0,0.4)'
-            e.currentTarget.style.transform = 'scale(1.02)'
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.boxShadow = 'none'
-            e.currentTarget.style.transform = 'scale(1)'
-          }}
-        >
-          BOOK NOW →
-        </a>
+        <p className="text-muted text-sm mb-6">
+          Ready to join? Message us on WhatsApp, or fill in the form and we’ll get back to you.
+        </p>
+        <CTAButtons joinLabel="BOOK NOW →" size="lg" className="justify-center" />
       </div>
     </div>
   )

@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useScrollReveal } from '../hooks/useScrollAnimation'
+import { FillFormLink } from '../components/CTAButtons'
+import { WHATSAPP_URL } from '../config/site'
 import { Dumbbell, Clock, User } from 'lucide-react'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8000'
@@ -88,14 +90,19 @@ function ClassCard({ cls, index }) {
             <span className="text-muted">Certified Trainer</span>
           </div>
         </div>
-        <a
-          href="https://api.whatsapp.com/send/?phone=919912223125&text&type=phone_number&app_absent=0"
-          target="_blank"
-          rel="noreferrer"
-          className="mt-6 inline-block border border-accent text-accent text-xs font-bold uppercase tracking-widest px-6 py-2 hover:bg-accent hover:text-black transition-all w-fit"
-        >
-          BOOK THIS CLASS →
-        </a>
+        {/* Existing button kept as-is; the form gets a compact text link so the
+            card layout is unchanged. */}
+        <div className="mt-6 flex flex-wrap items-center gap-4">
+          <a
+            href={WHATSAPP_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="cta-btn inline-block border border-accent text-accent text-xs font-bold uppercase tracking-widest px-6 py-2 hover:bg-accent hover:text-black transition-all w-fit"
+          >
+            BOOK THIS CLASS →
+          </a>
+          <FillFormLink />
+        </div>
       </div>
     </div>
   )

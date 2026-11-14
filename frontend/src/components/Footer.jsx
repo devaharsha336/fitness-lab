@@ -1,11 +1,12 @@
 import { Link } from 'react-router-dom'
 import { Instagram, Facebook, MessageCircle, MapPin, Phone } from 'lucide-react'
+import { SOCIAL_LINKS, BUSINESS, ADDRESS_SHORT } from '../config/site'
 
 const SOCIAL = [
-  { icon: Instagram, href: 'https://www.instagram.com/thefitnesslabgym?utm_source=qr&igsh=MWRwc3ljbXV2eHN1ZA%3D%3D', label: 'Instagram' },
-  { icon: Facebook, href: 'https://www.facebook.com/thefitnesslabfl?rdid=I0DAc5rDNaR39ix5&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F14atX1FapyC%2F', label: 'Facebook' },
-  { icon: MessageCircle, href: 'https://api.whatsapp.com/send/?phone=919912223125&text&type=phone_number&app_absent=0', label: 'WhatsApp' },
-  { icon: MapPin, href: 'https://share.google/HdkgsfHTe9xOIv1ze', label: 'Google Maps' },
+  { icon: Instagram, href: SOCIAL_LINKS.instagram, label: 'Instagram' },
+  { icon: Facebook, href: SOCIAL_LINKS.facebook, label: 'Facebook' },
+  { icon: MessageCircle, href: SOCIAL_LINKS.whatsapp, label: 'WhatsApp' },
+  { icon: MapPin, href: SOCIAL_LINKS.maps, label: 'Google Maps' },
 ]
 
 export default function Footer() {

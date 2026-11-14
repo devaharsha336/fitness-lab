@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { Lock, Menu, X } from 'lucide-react'
+import { JoinNowButton, FillFormButton } from './CTAButtons'
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
@@ -56,23 +57,8 @@ export default function Navbar() {
           className="hidden md:flex items-center gap-4"
           style={{ opacity: 0, animation: 'fadeSlideUp 0.5s ease forwards 0.45s' }}
         >
-          <a
-            href="https://api.whatsapp.com/send/?phone=919912223125&text&type=phone_number&app_absent=0"
-            target="_blank"
-            rel="noreferrer"
-            className="bg-accent text-black font-body font-bold text-xs uppercase tracking-widest px-5 py-2"
-            style={{ transition: 'transform 0.2s ease, box-shadow 0.2s ease' }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.boxShadow = '0 0 20px rgba(230,255,0,0.4)'
-              e.currentTarget.style.transform = 'scale(1.02)'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.boxShadow = 'none'
-              e.currentTarget.style.transform = 'scale(1)'
-            }}
-          >
-            JOIN NOW
-          </a>
+          <JoinNowButton size="sm" />
+          <FillFormButton size="sm" />
           <Link
             to="/owner-login"
             className="flex items-center gap-1.5 text-white border border-border px-3 py-2 text-xs uppercase tracking-widest font-body hover:border-accent hover:text-accent transition-colors"
@@ -82,14 +68,20 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* Mobile hamburger */}
-        <button
-          className="md:hidden text-white"
-          onClick={() => setMenuOpen(!menuOpen)}
-          aria-label="Toggle menu"
-        >
-          {menuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
+        {/* Mobile: compact form pill + hamburger. Two full-width buttons will
+            not fit beside the logo at 375px, so the form CTA is shortened to
+            "FORM" here and shown in full inside the menu. */}
+        <div className="md:hidden flex items-center gap-3">
+          <FillFormButton size="sm" label="FORM" className="!px-3 !py-1.5" />
+          <button
+            className="text-white"
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label="Toggle menu"
+            aria-expanded={menuOpen}
+          >
+            {menuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile Menu — smooth slide */}
@@ -98,6 +90,10 @@ export default function Navbar() {
         style={{
           maxHeight: menuOpen ? '400px' : '0',
           opacity: menuOpen ? 1 : 0,
+          // Without this the collapsed menu is merely transparent, so its
+          // links stay focusable and are still announced by screen readers.
+          visibility: menuOpen ? 'visible' : 'hidden',
+          transitionProperty: 'max-height, opacity, visibility',
           background: 'rgba(0, 0, 0, 0.85)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
@@ -115,14 +111,8 @@ export default function Navbar() {
               {page}
             </NavLink>
           ))}
-          <a
-            href="https://api.whatsapp.com/send/?phone=919912223125&text&type=phone_number&app_absent=0"
-            target="_blank"
-            rel="noreferrer"
-            className="bg-accent text-black font-bold text-xs uppercase tracking-widest px-5 py-2 text-center"
-          >
-            JOIN NOW
-          </a>
+          <JoinNowButton size="sm" className="w-full" />
+          <FillFormButton size="sm" className="w-full" />
           <Link
             to="/owner-login"
             className="flex items-center justify-center gap-1.5 text-white border border-border px-3 py-2 text-xs uppercase tracking-widest"
