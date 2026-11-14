@@ -19,7 +19,7 @@ export default function Footer() {
             THE FITNESS <span style={{ color: '#E6FF00' }}>LAB</span>
           </p>
           <p className="text-muted text-sm leading-relaxed">
-            Where science meets sweat. Premium fitness experience in the heart of Hyderabad.
+            Where science meets sweat. Premium fitness experience in Manikonda, Hyderabad.
           </p>
         </div>
 
