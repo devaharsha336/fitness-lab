@@ -1,14 +1,16 @@
 import { useState } from 'react'
 import { X, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useScrollReveal } from '../hooks/useScrollAnimation'
+import Seo from '../components/Seo'
+import { PAGE_SEO } from '../config/seo'
 
 const IMAGES = [
-  { src: '/images/hero_banner.jpg', alt: 'The Fitness Lab gym floor' },
-  { src: '/images/full_gym_overview.jpg', alt: 'Full gym overview' },
-  { src: '/images/cardio_zone.jpg', alt: 'Cardio zone' },
-  { src: '/images/functional_zone.jpg', alt: 'Functional training zone' },
-  { src: '/images/strength_weights.jpg', alt: 'Strength and weights area' },
-  { src: '/images/reception_about.jpg', alt: 'Reception area' },
+  { src: '/images/hero_banner.webp', w: 1920, h: 1080, alt: 'Main training floor at The Fitness Lab gym in Manikonda, Hyderabad' },
+  { src: '/images/full_gym_overview.webp', w: 1200, h: 800, alt: 'Overview of the gym floor and equipment at The Fitness Lab, Manikonda' },
+  { src: '/images/cardio_zone.webp', w: 1200, h: 800, alt: 'Cardio zone with treadmills and cycles at The Fitness Lab, Manikonda' },
+  { src: '/images/functional_zone.webp', w: 1200, h: 800, alt: 'Functional training zone at The Fitness Lab gym, Manikonda, Hyderabad' },
+  { src: '/images/strength_weights.webp', w: 1200, h: 800, alt: 'Strength training area with free weights at The Fitness Lab, Manikonda' },
+  { src: '/images/reception_about.webp', w: 1200, h: 800, alt: 'Reception area at The Fitness Lab gym in Manikonda, Hyderabad' },
 ]
 
 function GalleryImage({ img, index, onClick }) {
@@ -24,6 +26,10 @@ function GalleryImage({ img, index, onClick }) {
       <img
         src={img.src}
         alt={img.alt}
+        width={img.w}
+        height={img.h}
+        loading="lazy"
+        decoding="async"
         className="w-full h-full object-cover transition-all duration-500 hover:scale-[1.05] hover:brightness-110"
       />
     </div>
@@ -46,6 +52,7 @@ export default function Gallery() {
 
   return (
     <div className="min-h-screen pt-24 pb-20 px-6 md:px-16 max-w-7xl mx-auto">
+      <Seo {...PAGE_SEO.gallery} />
       <p ref={labelRef} className="section-label mb-3">Take A Look</p>
       <h1 ref={headingRef} className="section-heading text-5xl md:text-7xl mb-12">Our Gallery</h1>
 

@@ -2,13 +2,33 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>The Fitness Lab — Premium Gym in Hyderabad</title>
-    <meta name="description" content="The Fitness Lab — Where science meets sweat. Premium fitness experience in Manikonda, Hyderabad." />
+
+    <!--
+      Title is a fallback only. react-helmet-async sets a unique title,
+      description, canonical and Open Graph tags per route (see
+      src/components/Seo.jsx), and the build prerenders each route so those
+      tags end up in the static HTML. There is deliberately no static
+      description meta tag here: Helmet adds its own, and keeping one here
+      as well would leave the page with two.
+    -->
+    <title>The Fitness Lab | Best Gym in Manikonda, Hyderabad</title>
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <meta name="theme-color" content="#000000" />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
+
+    <!--
+      The hero is the LCP element and is painted as a CSS background, which
+      cannot carry fetchpriority. Preloading it starts the download with the
+      HTML instead of after the stylesheet has been parsed.
+    -->
+    <link rel="preload" as="image" href="/images/hero_banner.webp" type="image/webp" fetchpriority="high" />
   </head>
   <body>
     <div id="root"></div>

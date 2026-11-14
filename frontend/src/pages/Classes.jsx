@@ -3,6 +3,8 @@ import { useScrollReveal } from '../hooks/useScrollAnimation'
 import { FillFormLink } from '../components/CTAButtons'
 import { WHATSAPP_URL } from '../config/site'
 import { Dumbbell, Clock, User } from 'lucide-react'
+import Seo from '../components/Seo'
+import { PAGE_SEO } from '../config/seo'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
@@ -52,9 +54,17 @@ function ClassCard({ cls, index }) {
     >
       {/* Image side */}
       <div className="min-h-64 relative overflow-hidden">
-        <div
-          className="absolute inset-0 transition-transform duration-500 group-hover:scale-105"
-          style={{ backgroundImage: `url(${cls.image_url})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+        {/* Real <img> rather than a CSS background, so the photo is
+            crawlable and carries alt text. object-cover matches the
+            previous background-size: cover exactly. */}
+        <img
+          src={cls.image_url}
+          alt={`${cls.name} class at The Fitness Lab gym in Manikonda, Hyderabad`}
+          width={800}
+          height={533}
+          loading="lazy"
+          decoding="async"
+          className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
         <div
           className="absolute inset-0"
@@ -78,7 +88,7 @@ function ClassCard({ cls, index }) {
         }}
       >
         <Dumbbell size={24} style={{ color: '#E6FF00' }} className="mb-4" />
-        <h3 className="section-heading text-3xl mb-3">{cls.name.toUpperCase()}</h3>
+        <h2 className="section-heading text-3xl mb-3">{cls.name.toUpperCase()}</h2>
         <p className="text-muted text-sm leading-relaxed mb-6">{cls.description}</p>
         <div className="flex flex-col gap-3">
           <div className="flex items-center gap-3 text-sm">
@@ -124,6 +134,7 @@ export default function Classes() {
 
   return (
     <div className="min-h-screen pt-24 pb-20 px-6 md:px-16 max-w-7xl mx-auto">
+      <Seo {...PAGE_SEO.classes} />
       <p ref={labelRef} className="section-label mb-3">What We Offer</p>
       <h1 ref={headingRef} className="section-heading text-5xl md:text-7xl mb-12">Our Classes</h1>
       <div className="flex flex-col gap-6">

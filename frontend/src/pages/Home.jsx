@@ -5,6 +5,8 @@ import { Instagram, Facebook, MessageCircle, MapPin, Dumbbell, X, Phone } from '
 import { useScrollReveal } from '../hooks/useScrollAnimation'
 import CTAButtons, { JoinNowButton, FillFormButton, FillFormLink } from '../components/CTAButtons'
 import { WHATSAPP_URL, SOCIAL_LINKS } from '../config/site'
+import Seo from '../components/Seo'
+import { PAGE_SEO } from '../config/seo'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
@@ -242,10 +244,19 @@ function ProgramCard({ cls, index, onOpen }) {
       onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'rgba(230,255,0,0.4)' }}
       onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)' }}
     >
-      {/* Background with zoom on hover */}
-      <div
-        className="absolute inset-0 transition-transform duration-500 group-hover:scale-105"
-        style={{ backgroundImage: `url(${cls.image_url})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+      {/* Background with zoom on hover.
+          A real <img> rather than a CSS background so the photo is
+          crawlable and carries alt text. object-cover + the default
+          centre object-position reproduce background-size: cover exactly,
+          so this renders identically. */}
+      <img
+        src={cls.image_url}
+        alt={`${cls.name} training at The Fitness Lab gym in Manikonda, Hyderabad`}
+        width={800}
+        height={533}
+        loading="lazy"
+        decoding="async"
+        className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
       />
       {/* Glass dark overlay */}
       <div
@@ -290,7 +301,7 @@ function ProgramCard({ cls, index, onOpen }) {
   )
 }
 
-function FacilityImage({ src, index }) {
+function FacilityImage({ src, alt, index }) {
   const ref = useScrollObserver(0.1)
   return (
     <div
@@ -300,7 +311,11 @@ function FacilityImage({ src, index }) {
     >
       <img
         src={src}
-        alt="Fitness Lab facility"
+        alt={alt}
+        width={1200}
+        height={800}
+        loading="lazy"
+        decoding="async"
         className="w-full h-full object-cover transition-all duration-500 hover:scale-[1.03] hover:brightness-110"
       />
     </div>
@@ -354,6 +369,7 @@ export default function Home() {
 
   return (
     <>
+      <Seo {...PAGE_SEO.home} />
       <TimingsBanner />
       <ProgramModal program={selectedProgram} onClose={() => setSelectedProgram(null)} />
       {/* HERO */}
@@ -361,7 +377,7 @@ export default function Home() {
         {/* Background with zoom animation */}
         <div
           className="absolute inset-0 hero-bg"
-          style={{ backgroundImage: 'url(/images/hero_banner.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }}
+          style={{ backgroundImage: 'url(/images/hero_banner.webp)', backgroundSize: 'cover', backgroundPosition: 'center' }}
         />
         {/* Dark overlay */}
         <div className="absolute inset-0" style={{ background: 'linear-gradient(to right, rgba(0,0,0,0.92) 40%, rgba(0,0,0,0.3))' }} />
@@ -443,12 +459,12 @@ export default function Home() {
         <h2 ref={headingFacilityRef} className="section-heading text-5xl md:text-6xl mb-10">Our Facility</h2>
         <div className="grid grid-cols-2 gap-2">
           {[
-            '/images/full_gym_overview.jpg',
-            '/images/cardio_zone.jpg',
-            '/images/strength_weights.jpg',
-            '/images/hero_banner.jpg',
-          ].map((src, i) => (
-            <FacilityImage key={src} src={src} index={i} />
+            { src: '/images/full_gym_overview.webp', alt: 'Gym floor and equipment at The Fitness Lab, Manikonda, Hyderabad' },
+            { src: '/images/cardio_zone.webp', alt: 'Cardio zone with treadmills at The Fitness Lab, Manikonda' },
+            { src: '/images/strength_weights.webp', alt: 'Strength training area with free weights at The Fitness Lab, Manikonda' },
+            { src: '/images/hero_banner.webp', alt: 'Main training floor at The Fitness Lab gym in Manikonda, Hyderabad' },
+          ].map((img, i) => (
+            <FacilityImage key={img.src} src={img.src} alt={img.alt} index={i} />
           ))}
         </div>
       </section>

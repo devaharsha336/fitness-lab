@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { Check } from 'lucide-react'
 import { useScrollReveal } from '../hooks/useScrollAnimation'
 import CTAButtons from '../components/CTAButtons'
+import Seo from '../components/Seo'
+import { PAGE_SEO } from '../config/seo'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
@@ -59,6 +61,7 @@ export default function Pricing() {
 
   return (
     <div className="min-h-screen pt-24 pb-20 px-6 md:px-16 max-w-7xl mx-auto">
+      <Seo {...PAGE_SEO.pricing} />
       <p ref={labelRef} className="section-label mb-3">Membership Plans</p>
       <h1 ref={headingRef} className="section-heading text-5xl md:text-7xl mb-4">Our Packages</h1>
       <p className="text-muted mb-12 max-w-xl">All memberships include full access to our facility. Choose the plan that works for you.</p>

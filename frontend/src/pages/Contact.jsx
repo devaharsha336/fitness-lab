@@ -2,6 +2,8 @@ import { MapPin, Phone, Clock, Instagram, Facebook, MessageCircle } from 'lucide
 import { useScrollReveal } from '../hooks/useScrollAnimation'
 import { JoinNowButton, FillFormButton } from '../components/CTAButtons'
 import { SOCIAL_LINKS } from '../config/site'
+import Seo from '../components/Seo'
+import { PAGE_SEO } from '../config/seo'
 
 const SOCIAL = [
   { icon: Instagram, href: SOCIAL_LINKS.instagram, label: 'Instagram' },
@@ -16,6 +18,7 @@ export default function Contact() {
 
   return (
     <div className="min-h-screen pt-24 pb-20 px-6 md:px-16 max-w-7xl mx-auto">
+      <Seo {...PAGE_SEO.contact} />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
         {/* LEFT */}
         <div ref={leftRef}>

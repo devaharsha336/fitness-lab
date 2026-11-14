@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { Mail, Lock, Eye, EyeOff, ArrowLeft } from 'lucide-react'
+import Seo from '../components/Seo'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
@@ -34,7 +35,9 @@ export default function OwnerLogin() {
   }
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center px-4 relative">
+    <>
+      <Seo title="Owner Login | The Fitness Lab" description="Private administrator sign-in for The Fitness Lab." path="/owner-login" noindex />
+      <div className="min-h-screen bg-black flex items-center justify-center px-4 relative">
       <Link to="/" className="absolute top-6 left-6 flex items-center gap-2 text-muted text-sm hover:text-accent transition-colors">
         <ArrowLeft size={16} />
         Back to site
@@ -100,6 +103,7 @@ export default function OwnerLogin() {
           </button>
         </form>
       </div>
-    </div>
+      </div>
+    </>
   )
 }

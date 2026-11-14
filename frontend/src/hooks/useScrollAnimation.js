@@ -45,10 +45,15 @@ export function useScrollReveal(threshold = 0.15, initialClass) {
       // transition-delay). Restore the previous value afterwards so hover and
       // scroll transitions on the same element keep working.
       const previousTransition = el.style.transition
+      // Saved separately: assigning the `transition` shorthand resets
+      // transition-delay, which several components set inline to stagger
+      // their reveal.
+      const previousDelay = el.style.transitionDelay
       el.style.transition = 'none'
       el.classList.add('visible')
       void el.offsetHeight // force a reflow to commit it untransitioned
       el.style.transition = previousTransition
+      el.style.transitionDelay = previousDelay
       return
     }
 
