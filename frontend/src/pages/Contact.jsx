@@ -1,5 +1,5 @@
-import { useEffect, useRef } from 'react'
 import { MapPin, Phone, Clock, Instagram, Facebook, MessageCircle } from 'lucide-react'
+import { useScrollReveal } from '../hooks/useScrollAnimation'
 
 const SOCIAL = [
   { icon: Instagram, href: 'https://www.instagram.com/thefitnesslabgym?utm_source=qr&igsh=MWRwc3ljbXV2eHN1ZA%3D%3D', label: 'Instagram' },
@@ -9,26 +9,8 @@ const SOCIAL = [
 ]
 
 export default function Contact() {
-  const leftRef = useRef(null)
-  const rightRef = useRef(null)
-
-  useEffect(() => {
-    const els = [
-      { el: leftRef.current, cls: 'animate-from-left' },
-      { el: rightRef.current, cls: 'animate-on-scroll' },
-    ]
-    const observers = els.map(({ el, cls }) => {
-      if (!el) return null
-      el.classList.add(cls)
-      const obs = new IntersectionObserver(
-        ([entry]) => { if (entry.isIntersecting) { el.classList.add('visible'); obs.unobserve(el) } },
-        { threshold: 0.15 }
-      )
-      obs.observe(el)
-      return obs
-    })
-    return () => observers.forEach((obs) => obs?.disconnect())
-  }, [])
+  const leftRef = useScrollReveal(0.15, 'animate-from-left')
+  const rightRef = useScrollReveal(0.15, 'animate-on-scroll')
 
   return (
     <div className="min-h-screen pt-24 pb-20 px-6 md:px-16 max-w-7xl mx-auto">

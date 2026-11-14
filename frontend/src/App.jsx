@@ -8,6 +8,7 @@ import Gallery from './pages/Gallery'
 import Pricing from './pages/Pricing'
 import Contact from './pages/Contact'
 import OwnerLogin from './pages/OwnerLogin'
+import NotFound from './pages/NotFound'
 import Dashboard from './dashboard/Dashboard'
 
 function ProtectedRoute({ children }) {
@@ -50,6 +51,7 @@ export default function App() {
           <Route path="/contact" element={<Layout><Contact /></Layout>} />
           <Route path="/owner-login" element={<OwnerLogin />} />
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="*" element={<Layout><NotFound /></Layout>} />
         </Routes>
       </PageWrapper>
     </BrowserRouter>

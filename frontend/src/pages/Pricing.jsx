@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Check } from 'lucide-react'
+import { useScrollReveal } from '../hooks/useScrollAnimation'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
@@ -21,17 +22,7 @@ const INCLUDES = [
 const COLS = ['Package', 'Monthly', 'Quarterly (3 months)', 'Half-Yearly (6 months)', 'Yearly (12 months)']
 
 function PricingRow({ row, index }) {
-  const ref = useRef(null)
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    const obs = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) { el.classList.add('visible'); obs.unobserve(el) } },
-      { threshold: 0.1 }
-    )
-    obs.observe(el)
-    return () => obs.disconnect()
-  }, [])
+  const ref = useScrollReveal(0.1)
 
   return (
     <tr
@@ -58,29 +49,11 @@ function PricingRow({ row, index }) {
 
 export default function Pricing() {
   const [pricing, setPricing] = useState(FALLBACK)
-  const labelRef = useRef(null)
-  const headingRef = useRef(null)
+  const labelRef = useScrollReveal(0.15, 'animate-from-left')
+  const headingRef = useScrollReveal(0.15, 'animate-on-scroll')
 
   useEffect(() => {
     fetch(`${API}/api/pricing`).then(r => r.json()).then(data => { if (Array.isArray(data) && data.length > 0) setPricing(data) }).catch(() => {})
-  }, [])
-
-  useEffect(() => {
-    const els = [
-      { el: labelRef.current, cls: 'animate-from-left' },
-      { el: headingRef.current, cls: 'animate-on-scroll' },
-    ]
-    const observers = els.map(({ el, cls }) => {
-      if (!el) return null
-      el.classList.add(cls)
-      const obs = new IntersectionObserver(
-        ([entry]) => { if (entry.isIntersecting) { el.classList.add('visible'); obs.unobserve(el) } },
-        { threshold: 0.15 }
-      )
-      obs.observe(el)
-      return obs
-    })
-    return () => observers.forEach((obs) => obs?.disconnect())
   }, [])
 
   return (

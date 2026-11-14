@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
 import { Instagram, Facebook, MessageCircle, MapPin, Dumbbell, X, Phone } from 'lucide-react'
+import { useScrollReveal } from '../hooks/useScrollAnimation'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
@@ -103,24 +104,17 @@ function TimingsBanner() {
   )
 }
 
-function useScrollObserver(threshold = 0.15) {
-  const ref = useRef(null)
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    const obs = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) { el.classList.add('visible'); obs.unobserve(el) } },
-      { threshold }
-    )
-    obs.observe(el)
-    return () => obs.disconnect()
-  }, [threshold])
-  return ref
-}
+// Kept as a local alias so the call sites below read unchanged; the shared hook
+// also reveals anything already on screen at mount, before the first paint.
+const useScrollObserver = useScrollReveal
 
 function StatCounter({ value, suffix, label }) {
   const [count, setCount] = useState(0)
-  const ref = useRef(null)
+  // The card carries .animate-on-scroll (opacity: 0) but nothing here ever
+  // added .visible, so these three stats were invisible on the live site and
+  // their counters sat at "0+". The shared hook now does the revealing; the
+  // effect below still owns the count-up.
+  const ref = useScrollReveal(0.5)
   const animated = useRef(false)
 
   useEffect(() => {
@@ -356,36 +350,13 @@ export default function Home() {
     fetch(`${API}/api/pricing`).then(r => r.json()).then(data => { if (Array.isArray(data) && data.length > 0) setPricing(data) }).catch(() => {})
   }, [])
 
-  const labelProgramsRef = useRef(null)
-  const headingProgramsRef = useRef(null)
-  const labelFacilityRef = useRef(null)
-  const headingFacilityRef = useRef(null)
-  const labelPricingRef = useRef(null)
-  const headingPricingRef = useRef(null)
-  const ctaRef = useRef(null)
-
-  useEffect(() => {
-    const els = [
-      { el: labelProgramsRef.current, cls: 'animate-from-left' },
-      { el: headingProgramsRef.current, cls: 'animate-on-scroll' },
-      { el: labelFacilityRef.current, cls: 'animate-from-left' },
-      { el: headingFacilityRef.current, cls: 'animate-on-scroll' },
-      { el: labelPricingRef.current, cls: 'animate-from-left' },
-      { el: headingPricingRef.current, cls: 'animate-on-scroll' },
-      { el: ctaRef.current, cls: 'animate-on-scroll' },
-    ]
-    const observers = els.map(({ el, cls }) => {
-      if (!el) return null
-      el.classList.add(cls)
-      const obs = new IntersectionObserver(
-        ([entry]) => { if (entry.isIntersecting) { el.classList.add('visible'); obs.unobserve(el) } },
-        { threshold: 0.15 }
-      )
-      obs.observe(el)
-      return obs
-    })
-    return () => observers.forEach((obs) => obs?.disconnect())
-  }, [])
+  const labelProgramsRef = useScrollReveal(0.15, 'animate-from-left')
+  const headingProgramsRef = useScrollReveal(0.15, 'animate-on-scroll')
+  const labelFacilityRef = useScrollReveal(0.15, 'animate-from-left')
+  const headingFacilityRef = useScrollReveal(0.15, 'animate-on-scroll')
+  const labelPricingRef = useScrollReveal(0.15, 'animate-from-left')
+  const headingPricingRef = useScrollReveal(0.15, 'animate-on-scroll')
+  const ctaRef = useScrollReveal(0.15, 'animate-on-scroll')
 
   const displayClasses = (classes.length ? classes : CLASSES_FALLBACK).map(cls => ({
     ...cls,

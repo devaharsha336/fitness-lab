@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { X, ChevronLeft, ChevronRight } from 'lucide-react'
+import { useScrollReveal } from '../hooks/useScrollAnimation'
 
 const IMAGES = [
   { src: '/images/hero_banner.jpg', alt: 'The Fitness Lab gym floor' },
@@ -11,17 +12,7 @@ const IMAGES = [
 ]
 
 function GalleryImage({ img, index, onClick }) {
-  const ref = useRef(null)
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    const obs = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) { el.classList.add('visible'); obs.unobserve(el) } },
-      { threshold: 0.1 }
-    )
-    obs.observe(el)
-    return () => obs.disconnect()
-  }, [])
+  const ref = useScrollReveal(0.1)
 
   return (
     <div
@@ -41,26 +32,8 @@ function GalleryImage({ img, index, onClick }) {
 
 export default function Gallery() {
   const [lightbox, setLightbox] = useState(null)
-  const labelRef = useRef(null)
-  const headingRef = useRef(null)
-
-  useEffect(() => {
-    const els = [
-      { el: labelRef.current, cls: 'animate-from-left' },
-      { el: headingRef.current, cls: 'animate-on-scroll' },
-    ]
-    const observers = els.map(({ el, cls }) => {
-      if (!el) return null
-      el.classList.add(cls)
-      const obs = new IntersectionObserver(
-        ([entry]) => { if (entry.isIntersecting) { el.classList.add('visible'); obs.unobserve(el) } },
-        { threshold: 0.15 }
-      )
-      obs.observe(el)
-      return obs
-    })
-    return () => observers.forEach((obs) => obs?.disconnect())
-  }, [])
+  const labelRef = useScrollReveal(0.15, 'animate-from-left')
+  const headingRef = useScrollReveal(0.15, 'animate-on-scroll')
 
   const prev = () => setLightbox((i) => (i - 1 + IMAGES.length) % IMAGES.length)
   const next = () => setLightbox((i) => (i + 1) % IMAGES.length)

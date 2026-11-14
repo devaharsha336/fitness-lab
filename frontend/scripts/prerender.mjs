@@ -218,20 +218,30 @@ async function main() {
       const target = await writeRoute(route, html)
       const kb = (Buffer.byteLength(html) / 1024).toFixed(0)
       results.push({ route, kb })
-      log(`${route.padEnd(10)} -> ${target.replace(DIST, 'dist')} (${kb} KB)`)
+      log(`${route.padEnd(12)} -> ${target.replace(DIST, 'dist')} (${kb} KB)`)
     }
 
-    // Admin routes get a noindex shell rather than a snapshot. Without this
-    // they would fall through vercel.json's rewrite to dist/index.html and
-    // serve the prerendered HOME content under /dashboard.
+    // The untouched Vite shell, plus noindex. Used for anything that must boot
+    // the app without shipping indexable content.
+    const noindexShell = shellHtml.replace(
+      /<\/head>/,
+      '  <meta name="robots" content="noindex, nofollow" />\n  </head>'
+    )
+
+    // Admin routes get that shell rather than a snapshot. Without this they
+    // would fall through vercel.json's rewrite and serve prerendered content.
     for (const route of ADMIN_ROUTES) {
-      const stub = shellHtml.replace(
-        /<\/head>/,
-        '  <meta name="robots" content="noindex, nofollow" />\n  </head>'
-      )
-      const target = await writeRoute(route, stub)
-      log(`${route.padEnd(10)} -> ${target.replace(DIST, 'dist')} (noindex stub, not prerendered)`)
+      const target = await writeRoute(route, noindexShell)
+      log(`${route.padEnd(12)} -> ${target.replace(DIST, 'dist')} (noindex stub, not prerendered)`)
     }
+
+    // The catch-all target for unknown URLs. vercel.json points its rewrite
+    // here instead of at index.html: index.html is now the prerendered home
+    // page, so using it would serve the whole homepage under any wrong URL
+    // with a 200 - a soft 404 that Google indexes as a duplicate. React finds
+    // no matching route in this shell and renders the NotFound view.
+    await writeFile(join(DIST, 'spa.html'), noindexShell, 'utf8')
+    log(`${'(catch-all)'.padEnd(12)} -> dist/spa.html (noindex shell for unknown URLs)`)
 
     log(`Done. Prerendered ${results.length} public routes, stubbed ${ADMIN_ROUTES.length} admin routes.`)
   } catch (err) {

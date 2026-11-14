@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useScrollReveal } from '../hooks/useScrollAnimation'
 import { Dumbbell, Clock, User } from 'lucide-react'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8000'
@@ -36,17 +37,7 @@ const IMAGE_MAP = {
 }
 
 function ClassCard({ cls, index }) {
-  const ref = useRef(null)
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    const obs = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) { el.classList.add('visible'); obs.unobserve(el) } },
-      { threshold: 0.1 }
-    )
-    obs.observe(el)
-    return () => obs.disconnect()
-  }, [])
+  const ref = useScrollReveal(0.1)
 
   return (
     <div
@@ -112,29 +103,11 @@ function ClassCard({ cls, index }) {
 
 export default function Classes() {
   const [classes, setClasses] = useState([])
-  const labelRef = useRef(null)
-  const headingRef = useRef(null)
+  const labelRef = useScrollReveal(0.15, 'animate-from-left')
+  const headingRef = useScrollReveal(0.15, 'animate-on-scroll')
 
   useEffect(() => {
     fetch(`${API}/api/classes`).then(r => r.json()).then(data => { if (Array.isArray(data) && data.length > 0) setClasses(data) }).catch(() => {})
-  }, [])
-
-  useEffect(() => {
-    const els = [
-      { el: labelRef.current, cls: 'animate-from-left' },
-      { el: headingRef.current, cls: 'animate-on-scroll' },
-    ]
-    const observers = els.map(({ el, cls }) => {
-      if (!el) return null
-      el.classList.add(cls)
-      const obs = new IntersectionObserver(
-        ([entry]) => { if (entry.isIntersecting) { el.classList.add('visible'); obs.unobserve(el) } },
-        { threshold: 0.15 }
-      )
-      obs.observe(el)
-      return obs
-    })
-    return () => observers.forEach((obs) => obs?.disconnect())
   }, [])
 
   const data = (classes.length ? classes : FALLBACK).map(cls => ({
