@@ -10,6 +10,7 @@ import Contact from './pages/Contact'
 import OwnerLogin from './pages/OwnerLogin'
 import NotFound from './pages/NotFound'
 import Dashboard from './dashboard/Dashboard'
+import StructuredData from './components/StructuredData'
 
 function ProtectedRoute({ children }) {
   const token = localStorage.getItem('fitness_lab_token')
@@ -32,6 +33,7 @@ function PageWrapper({ children }) {
 function Layout({ children }) {
   return (
     <>
+      <StructuredData />
       <Navbar />
       <main>{children}</main>
       <Footer />
