@@ -392,7 +392,7 @@ export default function Home() {
         <div className="absolute pointer-events-none" style={{ bottom: '30%', right: '15%', width: 160, height: 160, borderRadius: '50%', background: 'rgba(230,255,0,0.04)', filter: 'blur(25px)', animation: 'float 6s ease-in-out infinite 0.5s' }} />
 
         <div className="relative z-10 max-w-3xl pt-32">
-          <p className="section-label mb-6 hero-label">Premium Fitness Experience</p>
+          <p className="section-label mb-6 hero-label">Premium Gym in Manikonda, Hyderabad</p>
           <h1 className="section-heading" style={{ fontSize: 'clamp(64px, 10vw, 96px)', lineHeight: 1 }}>
             <span className="block hero-the">THE</span>
             <span className="block hero-fit">FITNESS</span>
