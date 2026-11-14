@@ -5,12 +5,12 @@ import Seo from '../components/Seo'
 import { PAGE_SEO } from '../config/seo'
 
 const IMAGES = [
-  { src: '/images/hero_banner.webp', w: 1920, h: 1080, alt: 'Main training floor at The Fitness Lab gym in Manikonda, Hyderabad' },
-  { src: '/images/full_gym_overview.webp', w: 1200, h: 800, alt: 'Overview of the gym floor and equipment at The Fitness Lab, Manikonda' },
-  { src: '/images/cardio_zone.webp', w: 1200, h: 800, alt: 'Cardio zone with treadmills and cycles at The Fitness Lab, Manikonda' },
-  { src: '/images/functional_zone.webp', w: 1200, h: 800, alt: 'Functional training zone at The Fitness Lab gym, Manikonda, Hyderabad' },
-  { src: '/images/strength_weights.webp', w: 1200, h: 800, alt: 'Strength training area with free weights at The Fitness Lab, Manikonda' },
-  { src: '/images/reception_about.webp', w: 1200, h: 800, alt: 'Reception area at The Fitness Lab gym in Manikonda, Hyderabad' },
+  { base: '/images/hero_banner', src: '/images/hero_banner.webp', w: 1920, h: 1080, alt: 'Main training floor at The Fitness Lab gym in Manikonda, Hyderabad' },
+  { base: '/images/full_gym_overview', src: '/images/full_gym_overview.webp', w: 1200, h: 800, alt: 'Overview of the gym floor and equipment at The Fitness Lab, Manikonda' },
+  { base: '/images/cardio_zone', src: '/images/cardio_zone.webp', w: 1200, h: 800, alt: 'Cardio zone with treadmills and cycles at The Fitness Lab, Manikonda' },
+  { base: '/images/functional_zone', src: '/images/functional_zone.webp', w: 1200, h: 800, alt: 'Functional training zone at The Fitness Lab gym, Manikonda, Hyderabad' },
+  { base: '/images/strength_weights', src: '/images/strength_weights.webp', w: 1200, h: 800, alt: 'Strength training area with free weights at The Fitness Lab, Manikonda' },
+  { base: '/images/reception_about', src: '/images/reception_about.webp', w: 1200, h: 800, alt: 'Reception area at The Fitness Lab gym in Manikonda, Hyderabad' },
 ]
 
 function GalleryImage({ img, index, onClick }) {
@@ -25,6 +25,8 @@ function GalleryImage({ img, index, onClick }) {
     >
       <img
         src={img.src}
+        srcSet={`${img.base}-600.webp 600w, ${img.base}-900.webp 900w, ${img.src} ${img.w}w`}
+        sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
         alt={img.alt}
         width={img.w}
         height={img.h}

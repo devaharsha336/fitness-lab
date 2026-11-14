@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
 import { Instagram, Facebook, MessageCircle, MapPin, Dumbbell, X, Phone } from 'lucide-react'
 import { useScrollReveal } from '../hooks/useScrollAnimation'
+import { unsplashSrcSet, CARD_SIZES } from '../utils/images'
 import CTAButtons, { JoinNowButton, FillFormButton, FillFormLink } from '../components/CTAButtons'
 import { WHATSAPP_URL, SOCIAL_LINKS } from '../config/site'
 import Seo from '../components/Seo'
@@ -251,6 +252,8 @@ function ProgramCard({ cls, index, onOpen }) {
           so this renders identically. */}
       <img
         src={cls.image_url}
+        srcSet={unsplashSrcSet(cls.image_url)}
+        sizes={CARD_SIZES}
         alt={`${cls.name} training at The Fitness Lab gym in Manikonda, Hyderabad`}
         width={800}
         height={533}
@@ -301,7 +304,7 @@ function ProgramCard({ cls, index, onOpen }) {
   )
 }
 
-function FacilityImage({ src, alt, index }) {
+function FacilityImage({ src, base, alt, index }) {
   const ref = useScrollObserver(0.1)
   return (
     <div
@@ -311,6 +314,8 @@ function FacilityImage({ src, alt, index }) {
     >
       <img
         src={src}
+        srcSet={`${base}-600.webp 600w, ${base}-900.webp 900w, ${src} 1200w`}
+        sizes="(min-width: 768px) 50vw, 50vw"
         alt={alt}
         width={1200}
         height={800}
@@ -377,7 +382,6 @@ export default function Home() {
         {/* Background with zoom animation */}
         <div
           className="absolute inset-0 hero-bg"
-          style={{ backgroundImage: 'url(/images/hero_banner.webp)', backgroundSize: 'cover', backgroundPosition: 'center' }}
         />
         {/* Dark overlay */}
         <div className="absolute inset-0" style={{ background: 'linear-gradient(to right, rgba(0,0,0,0.92) 40%, rgba(0,0,0,0.3))' }} />
@@ -459,12 +463,12 @@ export default function Home() {
         <h2 ref={headingFacilityRef} className="section-heading text-5xl md:text-6xl mb-10">Our Facility</h2>
         <div className="grid grid-cols-2 gap-2">
           {[
-            { src: '/images/full_gym_overview.webp', alt: 'Gym floor and equipment at The Fitness Lab, Manikonda, Hyderabad' },
-            { src: '/images/cardio_zone.webp', alt: 'Cardio zone with treadmills at The Fitness Lab, Manikonda' },
-            { src: '/images/strength_weights.webp', alt: 'Strength training area with free weights at The Fitness Lab, Manikonda' },
-            { src: '/images/hero_banner.webp', alt: 'Main training floor at The Fitness Lab gym in Manikonda, Hyderabad' },
+            { base: '/images/full_gym_overview', src: '/images/full_gym_overview.webp', alt: 'Gym floor and equipment at The Fitness Lab, Manikonda, Hyderabad' },
+            { base: '/images/cardio_zone', src: '/images/cardio_zone.webp', alt: 'Cardio zone with treadmills at The Fitness Lab, Manikonda' },
+            { base: '/images/strength_weights', src: '/images/strength_weights.webp', alt: 'Strength training area with free weights at The Fitness Lab, Manikonda' },
+            { base: '/images/hero_banner', src: '/images/hero_banner.webp', alt: 'Main training floor at The Fitness Lab gym in Manikonda, Hyderabad' },
           ].map((img, i) => (
-            <FacilityImage key={img.src} src={img.src} alt={img.alt} index={i} />
+            <FacilityImage key={img.src} src={img.src} base={img.base} alt={img.alt} index={i} />
           ))}
         </div>
       </section>

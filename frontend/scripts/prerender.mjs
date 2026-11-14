@@ -182,10 +182,38 @@ async function snapshot(browser, origin, route) {
     if (!html.includes('<h1') || html.length < 2000) {
       throw new Error(`captured HTML looks empty (${html.length} bytes)`)
     }
-    return html
+    return normalizeCapturedHtml(html)
   } finally {
     await page.close().catch(() => {})
   }
+}
+
+/**
+ * Undoes runtime mutations that must not be frozen into the static HTML.
+ *
+ * index.html loads the Google Fonts stylesheet non-blockingly via
+ * media="print" plus an onload that promotes it to media="all". By the time
+ * we snapshot, that onload has already fired, so the captured markup says
+ * media="all" with no onload — i.e. a fully render-blocking stylesheet, with
+ * the optimisation silently undone for every real visitor. Lighthouse caught
+ * this as ~920ms of render-blocking time.
+ *
+ * Restoring the original form keeps the static HTML behaving like the source.
+ */
+function normalizeCapturedHtml(html) {
+  return html.replace(
+    /<link([^>]*?)href="(https:\/\/fonts\.googleapis\.com\/css2[^"]*)"([^>]*?)>/g,
+    (match, before, href, after) => {
+      // Leave the <noscript> copy alone: it is already inert.
+      if (/media="print"/.test(match)) return match
+      const attrs = `${before} ${after}`
+        .replace(/\s*media="[^"]*"/g, '')
+        .replace(/\s*onload="[^"]*"/g, '')
+        .replace(/\s+/g, ' ')
+        .trim()
+      return `<link ${attrs} href="${href}" media="print" onload="this.media='all';this.onload=null">`
+    }
+  )
 }
 
 async function writeRoute(route, html) {

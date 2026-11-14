@@ -21,14 +21,41 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
+    <!--
+      Loaded without blocking rendering. As a plain stylesheet this cost
+      about 900ms of render-blocking time on a throttled mobile connection:
+      nothing on the page could paint until Google's CSS had arrived.
+      media="print" makes the browser fetch it at low priority without
+      blocking, and onload promotes it to all media. The font URL already
+      carries display=swap, so text paints immediately in the fallback face
+      and swaps when the webfont lands.
+    -->
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=DM+Sans:wght@400;500&display=swap"
+      media="print"
+      onload="this.media='all';this.onload=null"
+    />
+    <noscript>
+      <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
+    </noscript>
 
     <!--
       The hero is the LCP element and is painted as a CSS background, which
-      cannot carry fetchpriority. Preloading it starts the download with the
-      HTML instead of after the stylesheet has been parsed.
+      cannot carry fetchpriority. Preloading starts the download with the HTML
+      rather than after the stylesheet has been parsed.
+
+      These media queries must stay identical to the .hero-bg rules in
+      index.css. An imagesrcset/imagesizes preload was tried first and picked
+      a different file from the one the CSS then used, so the hero was being
+      downloaded twice.
     -->
-    <link rel="preload" as="image" href="/images/hero_banner.webp" type="image/webp" fetchpriority="high" />
+    <link rel="preload" as="image" type="image/webp" fetchpriority="high"
+          href="/images/hero_banner-600.webp" media="(max-width: 640px)" />
+    <link rel="preload" as="image" type="image/webp" fetchpriority="high"
+          href="/images/hero_banner-900.webp" media="(min-width: 641px) and (max-width: 1099px)" />
+    <link rel="preload" as="image" type="image/webp" fetchpriority="high"
+          href="/images/hero_banner.webp" media="(min-width: 1100px)" />
   </head>
   <body>
     <div id="root"></div>

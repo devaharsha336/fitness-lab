@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useScrollReveal } from '../hooks/useScrollAnimation'
+import { unsplashSrcSet, CARD_SIZES } from '../utils/images'
 import { FillFormLink } from '../components/CTAButtons'
 import { WHATSAPP_URL } from '../config/site'
 import { Dumbbell, Clock, User } from 'lucide-react'
@@ -59,6 +60,8 @@ function ClassCard({ cls, index }) {
             previous background-size: cover exactly. */}
         <img
           src={cls.image_url}
+          srcSet={unsplashSrcSet(cls.image_url)}
+          sizes={CARD_SIZES}
           alt={`${cls.name} class at The Fitness Lab gym in Manikonda, Hyderabad`}
           width={800}
           height={533}

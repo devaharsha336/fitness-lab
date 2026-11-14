@@ -9,6 +9,9 @@ import { GOOGLE_FORM_URL, WHATSAPP_URL } from '../config/site'
  * aria-label says so, since an unannounced new tab is disorienting with a
  * screen reader.
  *
+ * The form links' aria-label begins with their visible text, which WCAG 2.5.3
+ * (Label in Name) requires so voice-control users can activate what they read.
+ *
  * The styling deliberately reproduces the button classes already used across
  * the site rather than introducing a new design: solid accent fill for the
  * primary action, outlined for the secondary.
@@ -61,7 +64,7 @@ export function FillFormButton({
       href={GOOGLE_FORM_URL}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label="Fill the membership enquiry form (opens in a new tab)"
+      aria-label="Fill the Form — membership enquiry (opens in a new tab)"
       className={`cta-btn inline-block text-center border border-accent text-accent font-body font-bold uppercase tracking-widest hover:bg-accent hover:text-black transition-colors ${SIZES[size]} ${className}`}
     >
       {label}
@@ -79,7 +82,7 @@ export function FillFormLink({ className = '' }) {
       href={GOOGLE_FORM_URL}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label="Fill the membership enquiry form (opens in a new tab)"
+      aria-label="Fill the Form — membership enquiry (opens in a new tab)"
       onClick={(e) => e.stopPropagation()}
       className={`cta-form-link inline-block text-xs font-body font-bold uppercase tracking-widest underline underline-offset-4 text-accent hover:text-white transition-colors ${className}`}
     >
