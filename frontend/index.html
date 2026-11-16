@@ -2,13 +2,60 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>The Fitness Lab — Premium Gym in Hyderabad</title>
-    <meta name="description" content="The Fitness Lab — Where science meets sweat. Premium fitness experience in Manikonda, Hyderabad." />
+
+    <!--
+      Title is a fallback only. react-helmet-async sets a unique title,
+      description, canonical and Open Graph tags per route (see
+      src/components/Seo.jsx), and the build prerenders each route so those
+      tags end up in the static HTML. There is deliberately no static
+      description meta tag here: Helmet adds its own, and keeping one here
+      as well would leave the page with two.
+    -->
+    <title>The Fitness Lab | Best Gym in Manikonda, Hyderabad</title>
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <meta name="theme-color" content="#000000" />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
+    <!--
+      Loaded without blocking rendering. As a plain stylesheet this cost
+      about 900ms of render-blocking time on a throttled mobile connection:
+      nothing on the page could paint until Google's CSS had arrived.
+      media="print" makes the browser fetch it at low priority without
+      blocking, and onload promotes it to all media. The font URL already
+      carries display=swap, so text paints immediately in the fallback face
+      and swaps when the webfont lands.
+    -->
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=DM+Sans:wght@400;500&display=swap"
+      media="print"
+      onload="this.media='all';this.onload=null"
+    />
+    <noscript>
+      <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
+    </noscript>
+
+    <!--
+      The hero is the LCP element and is painted as a CSS background, which
+      cannot carry fetchpriority. Preloading starts the download with the HTML
+      rather than after the stylesheet has been parsed.
+
+      These media queries must stay identical to the .hero-bg rules in
+      index.css. An imagesrcset/imagesizes preload was tried first and picked
+      a different file from the one the CSS then used, so the hero was being
+      downloaded twice.
+    -->
+    <link rel="preload" as="image" type="image/webp" fetchpriority="high"
+          href="/images/hero_banner-600.webp" media="(max-width: 640px)" />
+    <link rel="preload" as="image" type="image/webp" fetchpriority="high"
+          href="/images/hero_banner-900.webp" media="(min-width: 641px) and (max-width: 1099px)" />
+    <link rel="preload" as="image" type="image/webp" fetchpriority="high"
+          href="/images/hero_banner.webp" media="(min-width: 1100px)" />
   </head>
   <body>
     <div id="root"></div>

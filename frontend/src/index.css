@@ -140,7 +140,22 @@ body {
 .hero-sub    { opacity: 0; animation: fadeSlideUp   0.6s ease forwards 0.9s; }
 .hero-btns   { opacity: 0; animation: fadeSlideUp   0.6s ease forwards 1.1s; }
 .hero-social { opacity: 0; animation: fadeSlideUp   0.6s ease forwards 1.3s; }
-.hero-bg     { animation: heroZoom 8s ease forwards; transform-origin: center; }
+.hero-bg {
+  animation: heroZoom 8s ease forwards;
+  transform-origin: center;
+  background-image: url('/images/hero_banner-900.webp');
+  background-size: cover;
+  background-position: center;
+}
+
+/* Phones get the 600px crop (29KB) rather than the full 1920px file (233KB). */
+@media (max-width: 640px) {
+  .hero-bg { background-image: url('/images/hero_banner-600.webp'); }
+}
+
+@media (min-width: 1100px) {
+  .hero-bg { background-image: url('/images/hero_banner.webp'); }
+}
 
 /* ── Page transition ─────────────────────────────────────── */
 
@@ -202,4 +217,26 @@ body {
 @keyframes modalIn {
   from { opacity: 0; transform: scale(0.95); }
   to   { opacity: 1; transform: scale(1); }
+}
+
+/* ── CTA buttons (Join Now / Fill the Form) ──────────────── */
+
+/*
+ * Visible keyboard focus. The site previously relied on the browser default,
+ * which is invisible against the black background on several of these
+ * buttons. Only shown for keyboard users, so mouse clicks look unchanged.
+ */
+.cta-btn:focus-visible,
+.cta-form-link:focus-visible,
+.nav-link:focus-visible,
+a:focus-visible {
+  outline: 2px solid #E6FF00;
+  outline-offset: 3px;
+}
+
+/* Keep the pair from overflowing narrow phones. */
+@media (max-width: 380px) {
+  .cta-btn {
+    width: 100%;
+  }
 }

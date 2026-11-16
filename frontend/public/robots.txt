@@ -1,0 +1,10 @@
+# The Fitness Lab — https://thefitnesslab.co.in
+
+User-agent: *
+Allow: /
+
+# Admin area: no public content, nothing to index.
+Disallow: /owner-login
+Disallow: /dashboard
+
+Sitemap: https://thefitnesslab.co.in/sitemap.xml

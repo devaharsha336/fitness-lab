@@ -1,27 +1,20 @@
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { X, ChevronLeft, ChevronRight } from 'lucide-react'
+import { useScrollReveal } from '../hooks/useScrollAnimation'
+import Seo from '../components/Seo'
+import { PAGE_SEO } from '../config/seo'
 
 const IMAGES = [
-  { src: '/images/hero_banner.jpg', alt: 'The Fitness Lab gym floor' },
-  { src: '/images/full_gym_overview.jpg', alt: 'Full gym overview' },
-  { src: '/images/cardio_zone.jpg', alt: 'Cardio zone' },
-  { src: '/images/functional_zone.jpg', alt: 'Functional training zone' },
-  { src: '/images/strength_weights.jpg', alt: 'Strength and weights area' },
-  { src: '/images/reception_about.jpg', alt: 'Reception area' },
+  { base: '/images/hero_banner', src: '/images/hero_banner.webp', w: 1920, h: 1080, alt: 'Main training floor at The Fitness Lab gym in Manikonda, Hyderabad' },
+  { base: '/images/full_gym_overview', src: '/images/full_gym_overview.webp', w: 1200, h: 800, alt: 'Overview of the gym floor and equipment at The Fitness Lab, Manikonda' },
+  { base: '/images/cardio_zone', src: '/images/cardio_zone.webp', w: 1200, h: 800, alt: 'Cardio zone with treadmills and cycles at The Fitness Lab, Manikonda' },
+  { base: '/images/functional_zone', src: '/images/functional_zone.webp', w: 1200, h: 800, alt: 'Functional training zone at The Fitness Lab gym, Manikonda, Hyderabad' },
+  { base: '/images/strength_weights', src: '/images/strength_weights.webp', w: 1200, h: 800, alt: 'Strength training area with free weights at The Fitness Lab, Manikonda' },
+  { base: '/images/reception_about', src: '/images/reception_about.webp', w: 1200, h: 800, alt: 'Reception area at The Fitness Lab gym in Manikonda, Hyderabad' },
 ]
 
 function GalleryImage({ img, index, onClick }) {
-  const ref = useRef(null)
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    const obs = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) { el.classList.add('visible'); obs.unobserve(el) } },
-      { threshold: 0.1 }
-    )
-    obs.observe(el)
-    return () => obs.disconnect()
-  }, [])
+  const ref = useScrollReveal(0.1)
 
   return (
     <div
@@ -32,7 +25,13 @@ function GalleryImage({ img, index, onClick }) {
     >
       <img
         src={img.src}
+        srcSet={`${img.base}-600.webp 600w, ${img.base}-900.webp 900w, ${img.src} ${img.w}w`}
+        sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
         alt={img.alt}
+        width={img.w}
+        height={img.h}
+        loading="lazy"
+        decoding="async"
         className="w-full h-full object-cover transition-all duration-500 hover:scale-[1.05] hover:brightness-110"
       />
     </div>
@@ -41,26 +40,8 @@ function GalleryImage({ img, index, onClick }) {
 
 export default function Gallery() {
   const [lightbox, setLightbox] = useState(null)
-  const labelRef = useRef(null)
-  const headingRef = useRef(null)
-
-  useEffect(() => {
-    const els = [
-      { el: labelRef.current, cls: 'animate-from-left' },
-      { el: headingRef.current, cls: 'animate-on-scroll' },
-    ]
-    const observers = els.map(({ el, cls }) => {
-      if (!el) return null
-      el.classList.add(cls)
-      const obs = new IntersectionObserver(
-        ([entry]) => { if (entry.isIntersecting) { el.classList.add('visible'); obs.unobserve(el) } },
-        { threshold: 0.15 }
-      )
-      obs.observe(el)
-      return obs
-    })
-    return () => observers.forEach((obs) => obs?.disconnect())
-  }, [])
+  const labelRef = useScrollReveal(0.15, 'animate-from-left')
+  const headingRef = useScrollReveal(0.15, 'animate-on-scroll')
 
   const prev = () => setLightbox((i) => (i - 1 + IMAGES.length) % IMAGES.length)
   const next = () => setLightbox((i) => (i + 1) % IMAGES.length)
@@ -73,6 +54,7 @@ export default function Gallery() {
 
   return (
     <div className="min-h-screen pt-24 pb-20 px-6 md:px-16 max-w-7xl mx-auto">
+      <Seo {...PAGE_SEO.gallery} />
       <p ref={labelRef} className="section-label mb-3">Take A Look</p>
       <h1 ref={headingRef} className="section-heading text-5xl md:text-7xl mb-12">Our Gallery</h1>
 

@@ -2,14 +2,20 @@ import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
 import { Instagram, Facebook, MessageCircle, MapPin, Dumbbell, X, Phone } from 'lucide-react'
+import { useScrollReveal } from '../hooks/useScrollAnimation'
+import { unsplashSrcSet, CARD_SIZES } from '../utils/images'
+import CTAButtons, { JoinNowButton, FillFormButton, FillFormLink } from '../components/CTAButtons'
+import { WHATSAPP_URL, SOCIAL_LINKS } from '../config/site'
+import Seo from '../components/Seo'
+import { PAGE_SEO } from '../config/seo'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
 const SOCIAL = [
-  { icon: Instagram, href: 'https://www.instagram.com/thefitnesslabgym?utm_source=qr&igsh=MWRwc3ljbXV2eHN1ZA%3D%3D', label: 'Instagram' },
-  { icon: Facebook, href: 'https://www.facebook.com/thefitnesslabfl?rdid=I0DAc5rDNaR39ix5&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F14atX1FapyC%2F', label: 'Facebook' },
-  { icon: MessageCircle, href: 'https://api.whatsapp.com/send/?phone=919912223125&text&type=phone_number&app_absent=0', label: 'WhatsApp' },
-  { icon: MapPin, href: 'https://share.google/HdkgsfHTe9xOIv1ze', label: 'Maps' },
+  { icon: Instagram, href: SOCIAL_LINKS.instagram, label: 'Instagram' },
+  { icon: Facebook, href: SOCIAL_LINKS.facebook, label: 'Facebook' },
+  { icon: MessageCircle, href: SOCIAL_LINKS.whatsapp, label: 'WhatsApp' },
+  { icon: MapPin, href: SOCIAL_LINKS.maps, label: 'Maps' },
 ]
 
 const PRICING_FALLBACK = [
@@ -103,24 +109,17 @@ function TimingsBanner() {
   )
 }
 
-function useScrollObserver(threshold = 0.15) {
-  const ref = useRef(null)
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    const obs = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) { el.classList.add('visible'); obs.unobserve(el) } },
-      { threshold }
-    )
-    obs.observe(el)
-    return () => obs.disconnect()
-  }, [threshold])
-  return ref
-}
+// Kept as a local alias so the call sites below read unchanged; the shared hook
+// also reveals anything already on screen at mount, before the first paint.
+const useScrollObserver = useScrollReveal
 
 function StatCounter({ value, suffix, label }) {
   const [count, setCount] = useState(0)
-  const ref = useRef(null)
+  // The card carries .animate-on-scroll (opacity: 0) but nothing here ever
+  // added .visible, so these three stats were invisible on the live site and
+  // their counters sat at "0+". The shared hook now does the revealing; the
+  // effect below still owns the count-up.
+  const ref = useScrollReveal(0.5)
   const animated = useRef(false)
 
   useEffect(() => {
@@ -223,26 +222,8 @@ function ProgramModal({ program, onClose }) {
           {program.schedule}
         </p>
 
-        {/* Join Now CTA */}
-        <div className="block">
-          <a
-            href="https://api.whatsapp.com/send/?phone=919912223125&text&type=phone_number&app_absent=0"
-            target="_blank"
-            rel="noreferrer"
-            className="inline-block bg-accent text-black font-body font-bold text-sm uppercase tracking-widest px-8 py-3"
-            style={{ transition: 'transform 0.2s ease, box-shadow 0.2s ease' }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.boxShadow = '0 0 20px rgba(230,255,0,0.4)'
-              e.currentTarget.style.transform = 'scale(1.02)'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.boxShadow = 'none'
-              e.currentTarget.style.transform = 'scale(1)'
-            }}
-          >
-            JOIN NOW →
-          </a>
-        </div>
+        {/* Join Now / Fill the Form CTAs */}
+        <CTAButtons joinLabel="JOIN NOW →" />
       </div>
     </div>
   , document.body)
@@ -264,10 +245,21 @@ function ProgramCard({ cls, index, onOpen }) {
       onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'rgba(230,255,0,0.4)' }}
       onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)' }}
     >
-      {/* Background with zoom on hover */}
-      <div
-        className="absolute inset-0 transition-transform duration-500 group-hover:scale-105"
-        style={{ backgroundImage: `url(${cls.image_url})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+      {/* Background with zoom on hover.
+          A real <img> rather than a CSS background so the photo is
+          crawlable and carries alt text. object-cover + the default
+          centre object-position reproduce background-size: cover exactly,
+          so this renders identically. */}
+      <img
+        src={cls.image_url}
+        srcSet={unsplashSrcSet(cls.image_url)}
+        sizes={CARD_SIZES}
+        alt={`${cls.name} training at The Fitness Lab gym in Manikonda, Hyderabad`}
+        width={800}
+        height={533}
+        loading="lazy"
+        decoding="async"
+        className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
       />
       {/* Glass dark overlay */}
       <div
@@ -284,30 +276,35 @@ function ProgramCard({ cls, index, onOpen }) {
         <h3 className="section-heading text-2xl mb-1">{cls.name.toUpperCase()}</h3>
         <p className="text-muted text-sm mb-2">{cls.description}</p>
         <p className="text-xs font-medium tracking-widest uppercase" style={{ color: '#E6FF00' }}>{cls.schedule}</p>
-        <a
-          href="https://api.whatsapp.com/send/?phone=919912223125&text&type=phone_number&app_absent=0"
-          target="_blank"
-          rel="noreferrer"
-          className="inline-block mt-4 bg-accent text-black font-body font-bold text-xs uppercase tracking-widest px-5 py-2"
-          style={{ transition: 'transform 0.2s ease, box-shadow 0.2s ease' }}
-          onClick={(e) => e.stopPropagation()}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.boxShadow = '0 0 16px rgba(230,255,0,0.4)'
-            e.currentTarget.style.transform = 'scale(1.02)'
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.boxShadow = 'none'
-            e.currentTarget.style.transform = 'scale(1)'
-          }}
-        >
-          JOIN NOW →
-        </a>
+        {/* Existing button kept as-is; the form gets a compact text link so the
+            card layout is unchanged. */}
+        <div className="mt-4 flex flex-wrap items-center gap-4">
+          <a
+            href={WHATSAPP_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="cta-btn inline-block bg-accent text-black font-body font-bold text-xs uppercase tracking-widest px-5 py-2"
+            style={{ transition: 'transform 0.2s ease, box-shadow 0.2s ease' }}
+            onClick={(e) => e.stopPropagation()}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.boxShadow = '0 0 16px rgba(230,255,0,0.4)'
+              e.currentTarget.style.transform = 'scale(1.02)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.boxShadow = 'none'
+              e.currentTarget.style.transform = 'scale(1)'
+            }}
+          >
+            JOIN NOW →
+          </a>
+          <FillFormLink />
+        </div>
       </div>
     </div>
   )
 }
 
-function FacilityImage({ src, index }) {
+function FacilityImage({ src, base, alt, index }) {
   const ref = useScrollObserver(0.1)
   return (
     <div
@@ -317,7 +314,13 @@ function FacilityImage({ src, index }) {
     >
       <img
         src={src}
-        alt="Fitness Lab facility"
+        srcSet={`${base}-600.webp 600w, ${base}-900.webp 900w, ${src} 1200w`}
+        sizes="(min-width: 768px) 50vw, 50vw"
+        alt={alt}
+        width={1200}
+        height={800}
+        loading="lazy"
+        decoding="async"
         className="w-full h-full object-cover transition-all duration-500 hover:scale-[1.03] hover:brightness-110"
       />
     </div>
@@ -356,36 +359,13 @@ export default function Home() {
     fetch(`${API}/api/pricing`).then(r => r.json()).then(data => { if (Array.isArray(data) && data.length > 0) setPricing(data) }).catch(() => {})
   }, [])
 
-  const labelProgramsRef = useRef(null)
-  const headingProgramsRef = useRef(null)
-  const labelFacilityRef = useRef(null)
-  const headingFacilityRef = useRef(null)
-  const labelPricingRef = useRef(null)
-  const headingPricingRef = useRef(null)
-  const ctaRef = useRef(null)
-
-  useEffect(() => {
-    const els = [
-      { el: labelProgramsRef.current, cls: 'animate-from-left' },
-      { el: headingProgramsRef.current, cls: 'animate-on-scroll' },
-      { el: labelFacilityRef.current, cls: 'animate-from-left' },
-      { el: headingFacilityRef.current, cls: 'animate-on-scroll' },
-      { el: labelPricingRef.current, cls: 'animate-from-left' },
-      { el: headingPricingRef.current, cls: 'animate-on-scroll' },
-      { el: ctaRef.current, cls: 'animate-on-scroll' },
-    ]
-    const observers = els.map(({ el, cls }) => {
-      if (!el) return null
-      el.classList.add(cls)
-      const obs = new IntersectionObserver(
-        ([entry]) => { if (entry.isIntersecting) { el.classList.add('visible'); obs.unobserve(el) } },
-        { threshold: 0.15 }
-      )
-      obs.observe(el)
-      return obs
-    })
-    return () => observers.forEach((obs) => obs?.disconnect())
-  }, [])
+  const labelProgramsRef = useScrollReveal(0.15, 'animate-from-left')
+  const headingProgramsRef = useScrollReveal(0.15, 'animate-on-scroll')
+  const labelFacilityRef = useScrollReveal(0.15, 'animate-from-left')
+  const headingFacilityRef = useScrollReveal(0.15, 'animate-on-scroll')
+  const labelPricingRef = useScrollReveal(0.15, 'animate-from-left')
+  const headingPricingRef = useScrollReveal(0.15, 'animate-on-scroll')
+  const ctaRef = useScrollReveal(0.15, 'animate-on-scroll')
 
   const displayClasses = (classes.length ? classes : CLASSES_FALLBACK).map(cls => ({
     ...cls,
@@ -394,6 +374,7 @@ export default function Home() {
 
   return (
     <>
+      <Seo {...PAGE_SEO.home} />
       <TimingsBanner />
       <ProgramModal program={selectedProgram} onClose={() => setSelectedProgram(null)} />
       {/* HERO */}
@@ -401,7 +382,6 @@ export default function Home() {
         {/* Background with zoom animation */}
         <div
           className="absolute inset-0 hero-bg"
-          style={{ backgroundImage: 'url(/images/hero_banner.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }}
         />
         {/* Dark overlay */}
         <div className="absolute inset-0" style={{ background: 'linear-gradient(to right, rgba(0,0,0,0.92) 40%, rgba(0,0,0,0.3))' }} />
@@ -412,7 +392,7 @@ export default function Home() {
         <div className="absolute pointer-events-none" style={{ bottom: '30%', right: '15%', width: 160, height: 160, borderRadius: '50%', background: 'rgba(230,255,0,0.04)', filter: 'blur(25px)', animation: 'float 6s ease-in-out infinite 0.5s' }} />
 
         <div className="relative z-10 max-w-3xl pt-32">
-          <p className="section-label mb-6 hero-label">Premium Fitness Experience</p>
+          <p className="section-label mb-6 hero-label">Premium Gym in Manikonda, Hyderabad</p>
           <h1 className="section-heading" style={{ fontSize: 'clamp(64px, 10vw, 96px)', lineHeight: 1 }}>
             <span className="block hero-the">THE</span>
             <span className="block hero-fit">FITNESS</span>
@@ -422,23 +402,8 @@ export default function Home() {
             Where science meets sweat. Transform your body with world-class training, cutting-edge equipment, and relentless discipline.
           </p>
           <div className="flex flex-wrap gap-4 hero-btns">
-            <a
-              href="https://api.whatsapp.com/send/?phone=919912223125&text&type=phone_number&app_absent=0"
-              target="_blank"
-              rel="noreferrer"
-              className="bg-accent text-black font-body font-bold text-sm uppercase tracking-widest px-7 py-3"
-              style={{ transition: 'transform 0.2s ease, box-shadow 0.2s ease' }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.boxShadow = '0 0 20px rgba(230,255,0,0.4)'
-                e.currentTarget.style.transform = 'scale(1.02)'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.boxShadow = 'none'
-                e.currentTarget.style.transform = 'scale(1)'
-              }}
-            >
-              JOIN NOW →
-            </a>
+            <JoinNowButton label="JOIN NOW →" />
+            <FillFormButton />
             <Link
               to="/classes"
               className="border border-white text-white font-body font-medium text-sm uppercase tracking-widest px-7 py-3 hover:border-accent hover:text-accent transition-colors"
@@ -498,12 +463,12 @@ export default function Home() {
         <h2 ref={headingFacilityRef} className="section-heading text-5xl md:text-6xl mb-10">Our Facility</h2>
         <div className="grid grid-cols-2 gap-2">
           {[
-            '/images/full_gym_overview.jpg',
-            '/images/cardio_zone.jpg',
-            '/images/strength_weights.jpg',
-            '/images/hero_banner.jpg',
-          ].map((src, i) => (
-            <FacilityImage key={src} src={src} index={i} />
+            { base: '/images/full_gym_overview', src: '/images/full_gym_overview.webp', alt: 'Gym floor and equipment at The Fitness Lab, Manikonda, Hyderabad' },
+            { base: '/images/cardio_zone', src: '/images/cardio_zone.webp', alt: 'Cardio zone with treadmills at The Fitness Lab, Manikonda' },
+            { base: '/images/strength_weights', src: '/images/strength_weights.webp', alt: 'Strength training area with free weights at The Fitness Lab, Manikonda' },
+            { base: '/images/hero_banner', src: '/images/hero_banner.webp', alt: 'Main training floor at The Fitness Lab gym in Manikonda, Hyderabad' },
+          ].map((img, i) => (
+            <FacilityImage key={img.src} src={img.src} base={img.base} alt={img.alt} index={i} />
           ))}
         </div>
       </section>
@@ -528,24 +493,8 @@ export default function Home() {
             </tbody>
           </table>
         </div>
-        <div className="text-center mt-10">
-          <a
-            href="https://api.whatsapp.com/send/?phone=919912223125&text&type=phone_number&app_absent=0"
-            target="_blank"
-            rel="noreferrer"
-            className="inline-block bg-accent text-black font-bold text-sm uppercase tracking-widest px-10 py-3"
-            style={{ transition: 'transform 0.2s ease, box-shadow 0.2s ease' }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.boxShadow = '0 0 20px rgba(230,255,0,0.4)'
-              e.currentTarget.style.transform = 'scale(1.02)'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.boxShadow = 'none'
-              e.currentTarget.style.transform = 'scale(1)'
-            }}
-          >
-            BOOK NOW →
-          </a>
+        <div className="mt-10">
+          <CTAButtons joinLabel="BOOK NOW →" size="lg" className="justify-center" />
         </div>
       </section>
 
@@ -571,23 +520,11 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <a
-            href="https://api.whatsapp.com/send/?phone=919912223125&text&type=phone_number&app_absent=0"
-            target="_blank"
-            rel="noreferrer"
-            className="flex-shrink-0 bg-accent text-black font-bold text-sm uppercase tracking-widest px-10 py-4"
-            style={{ transition: 'transform 0.2s ease, box-shadow 0.2s ease' }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.boxShadow = '0 0 20px rgba(230,255,0,0.4)'
-              e.currentTarget.style.transform = 'scale(1.02)'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.boxShadow = 'none'
-              e.currentTarget.style.transform = 'scale(1)'
-            }}
-          >
-            CHAT ON WHATSAPP →
-          </a>
+          <CTAButtons
+            joinLabel="CHAT ON WHATSAPP →"
+            size="lg"
+            className="flex-shrink-0"
+          />
         </div>
       </section>
     </>

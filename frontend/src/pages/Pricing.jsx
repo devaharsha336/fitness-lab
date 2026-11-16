@@ -1,5 +1,9 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Check } from 'lucide-react'
+import { useScrollReveal } from '../hooks/useScrollAnimation'
+import CTAButtons from '../components/CTAButtons'
+import Seo from '../components/Seo'
+import { PAGE_SEO } from '../config/seo'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
@@ -21,17 +25,7 @@ const INCLUDES = [
 const COLS = ['Package', 'Monthly', 'Quarterly (3 months)', 'Half-Yearly (6 months)', 'Yearly (12 months)']
 
 function PricingRow({ row, index }) {
-  const ref = useRef(null)
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    const obs = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) { el.classList.add('visible'); obs.unobserve(el) } },
-      { threshold: 0.1 }
-    )
-    obs.observe(el)
-    return () => obs.disconnect()
-  }, [])
+  const ref = useScrollReveal(0.1)
 
   return (
     <tr
@@ -58,33 +52,16 @@ function PricingRow({ row, index }) {
 
 export default function Pricing() {
   const [pricing, setPricing] = useState(FALLBACK)
-  const labelRef = useRef(null)
-  const headingRef = useRef(null)
+  const labelRef = useScrollReveal(0.15, 'animate-from-left')
+  const headingRef = useScrollReveal(0.15, 'animate-on-scroll')
 
   useEffect(() => {
     fetch(`${API}/api/pricing`).then(r => r.json()).then(data => { if (Array.isArray(data) && data.length > 0) setPricing(data) }).catch(() => {})
   }, [])
 
-  useEffect(() => {
-    const els = [
-      { el: labelRef.current, cls: 'animate-from-left' },
-      { el: headingRef.current, cls: 'animate-on-scroll' },
-    ]
-    const observers = els.map(({ el, cls }) => {
-      if (!el) return null
-      el.classList.add(cls)
-      const obs = new IntersectionObserver(
-        ([entry]) => { if (entry.isIntersecting) { el.classList.add('visible'); obs.unobserve(el) } },
-        { threshold: 0.15 }
-      )
-      obs.observe(el)
-      return obs
-    })
-    return () => observers.forEach((obs) => obs?.disconnect())
-  }, [])
-
   return (
     <div className="min-h-screen pt-24 pb-20 px-6 md:px-16 max-w-7xl mx-auto">
+      <Seo {...PAGE_SEO.pricing} />
       <p ref={labelRef} className="section-label mb-3">Membership Plans</p>
       <h1 ref={headingRef} className="section-heading text-5xl md:text-7xl mb-4">Our Packages</h1>
       <p className="text-muted mb-12 max-w-xl">All memberships include full access to our facility. Choose the plan that works for you.</p>
@@ -135,24 +112,10 @@ export default function Pricing() {
       </div>
 
       <div className="text-center mt-4">
-        <p className="text-muted text-sm mb-6">Ready to join? Message us on WhatsApp to book your membership.</p>
-        <a
-          href="https://api.whatsapp.com/send/?phone=919912223125&text&type=phone_number&app_absent=0"
-          target="_blank"
-          rel="noreferrer"
-          className="inline-block bg-accent text-black font-bold text-sm uppercase tracking-widest px-12 py-4"
-          style={{ transition: 'transform 0.2s ease, box-shadow 0.2s ease' }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.boxShadow = '0 0 20px rgba(230,255,0,0.4)'
-            e.currentTarget.style.transform = 'scale(1.02)'
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.boxShadow = 'none'
-            e.currentTarget.style.transform = 'scale(1)'
-          }}
-        >
-          BOOK NOW →
-        </a>
+        <p className="text-muted text-sm mb-6">
+          Ready to join? Message us on WhatsApp, or fill in the form and we’ll get back to you.
+        </p>
+        <CTAButtons joinLabel="BOOK NOW →" size="lg" className="justify-center" />
       </div>
     </div>
   )

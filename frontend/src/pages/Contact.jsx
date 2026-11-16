@@ -1,37 +1,24 @@
-import { useEffect, useRef } from 'react'
 import { MapPin, Phone, Clock, Instagram, Facebook, MessageCircle } from 'lucide-react'
+import { useScrollReveal } from '../hooks/useScrollAnimation'
+import { JoinNowButton, FillFormButton } from '../components/CTAButtons'
+import { SOCIAL_LINKS } from '../config/site'
+import Seo from '../components/Seo'
+import { PAGE_SEO } from '../config/seo'
 
 const SOCIAL = [
-  { icon: Instagram, href: 'https://www.instagram.com/thefitnesslabgym?utm_source=qr&igsh=MWRwc3ljbXV2eHN1ZA%3D%3D', label: 'Instagram' },
-  { icon: Facebook, href: 'https://www.facebook.com/thefitnesslabfl?rdid=I0DAc5rDNaR39ix5&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F14atX1FapyC%2F', label: 'Facebook' },
-  { icon: MessageCircle, href: 'https://api.whatsapp.com/send/?phone=919912223125&text&type=phone_number&app_absent=0', label: 'WhatsApp' },
-  { icon: MapPin, href: 'https://share.google/HdkgsfHTe9xOIv1ze', label: 'Google Maps' },
+  { icon: Instagram, href: SOCIAL_LINKS.instagram, label: 'Instagram' },
+  { icon: Facebook, href: SOCIAL_LINKS.facebook, label: 'Facebook' },
+  { icon: MessageCircle, href: SOCIAL_LINKS.whatsapp, label: 'WhatsApp' },
+  { icon: MapPin, href: SOCIAL_LINKS.maps, label: 'Google Maps' },
 ]
 
 export default function Contact() {
-  const leftRef = useRef(null)
-  const rightRef = useRef(null)
-
-  useEffect(() => {
-    const els = [
-      { el: leftRef.current, cls: 'animate-from-left' },
-      { el: rightRef.current, cls: 'animate-on-scroll' },
-    ]
-    const observers = els.map(({ el, cls }) => {
-      if (!el) return null
-      el.classList.add(cls)
-      const obs = new IntersectionObserver(
-        ([entry]) => { if (entry.isIntersecting) { el.classList.add('visible'); obs.unobserve(el) } },
-        { threshold: 0.15 }
-      )
-      obs.observe(el)
-      return obs
-    })
-    return () => observers.forEach((obs) => obs?.disconnect())
-  }, [])
+  const leftRef = useScrollReveal(0.15, 'animate-from-left')
+  const rightRef = useScrollReveal(0.15, 'animate-on-scroll')
 
   return (
     <div className="min-h-screen pt-24 pb-20 px-6 md:px-16 max-w-7xl mx-auto">
+      <Seo {...PAGE_SEO.contact} />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
         {/* LEFT */}
         <div ref={leftRef}>
@@ -126,25 +113,13 @@ export default function Contact() {
           <MessageCircle size={48} style={{ color: '#E6FF00' }} className="mb-6" />
           <h2 className="section-heading text-3xl mb-4">Start Your Fitness Journey</h2>
           <p className="text-muted text-sm leading-relaxed mb-8">
-            Have questions about our packages or want to book a session? Reach out to us directly on WhatsApp.
+            Have questions about our packages or want to book a session? Reach out on
+            WhatsApp, or fill in the form and we’ll get back to you.
           </p>
-          <a
-            href="https://api.whatsapp.com/send/?phone=919912223125&text&type=phone_number&app_absent=0"
-            target="_blank"
-            rel="noreferrer"
-            className="w-full bg-accent text-black font-bold text-sm uppercase tracking-widest py-4 text-center block mb-4"
-            style={{ transition: 'transform 0.2s ease, box-shadow 0.2s ease' }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.boxShadow = '0 0 20px rgba(230,255,0,0.4)'
-              e.currentTarget.style.transform = 'scale(1.01)'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.boxShadow = 'none'
-              e.currentTarget.style.transform = 'scale(1)'
-            }}
-          >
-            CHAT ON WHATSAPP →
-          </a>
+          <div className="w-full flex flex-col gap-3 mb-4">
+            <JoinNowButton label="CHAT ON WHATSAPP →" size="lg" className="w-full" />
+            <FillFormButton size="lg" className="w-full" />
+          </div>
           <p className="text-muted text-sm">
             <a href="tel:+919912223125" className="hover:text-accent transition-colors">+91 99122 23125</a>
             {' '}|{' '}
