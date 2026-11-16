@@ -8,12 +8,10 @@
  * trust signal, so these must not drift apart.
  */
 
-// ---------------------------------------------------------------------------
-// TODO (before merging): replace with the real Google Form link.
-// This placeholder is live on every "Fill the Form" button on the site; the
-// buttons will 404 until it is swapped. Nothing else blocks the deploy.
-// ---------------------------------------------------------------------------
-export const GOOGLE_FORM_URL = 'https://forms.gle/REPLACE_ME'
+// Target of every "Fill the Form" button and link on the site. Membership
+// enquiries land in the linked Google Form's responses sheet.
+export const GOOGLE_FORM_URL =
+  'https://docs.google.com/forms/d/e/1FAIpQLSdj7cNNVFlKETEPc6YPe4fSSILoCtN782izlRmwROXaUMoC4Q/viewform'
 
 export const SITE_URL = 'https://thefitnesslab.co.in'
 
